@@ -150,3 +150,32 @@ class B {
 - 코드 중복 감소함
 - 모듈성을 증가시킬 수 있음
 - 흩어진 관심사(cross-cutting concerns)의 분리
+
+## 3. PSA (Portable Service Abstraction)
+
+### 3-1. 개념 정리
+
+- 서비스 추상화 : 추상화 계층을 사용하여 어떤 기술을 내부에 숨기고 개발자에게 편의성을 제공해주는 것임.
+- 어댑터 디자인 패턴을 이용해서 하나의 추상화로 여러 서비스를 묶어둔 것을 Portable Service Abstraction(PSA)라고 함
+  - ex) DB에 접근하는 방법은 여러가지가 있음. 기본적으로 Jdbc를 통해 접근(DatasourceTransactionManager)할 수 있으며 ORM을 이용하고자한다면 JPA(JpaTransactionManager)를 통해서 접근할 수도 있음. 어떠한 경우라도 @Transactional 어노테이션을 이용하면 트랜잭션을 유지하는 기능을 추가할 수 있음.
+- 서블릿 어플리케이션임에도 불구하고 서블릿이 전혀 존재하지 않음. 단지 @Controller 어노테이션이 붙어있는 클래스에서 @GetMapping, @PostMapping과 같은 @RequestMapping 어노테이션을 사용해서 요청을 매핑하는 것임.
+- 환경과 세부 기술의 변화에 관계없이 일관된 방식으로 기술에 접근할 수 있게 해줌. -> 객체를 POJO 기반으로 한번 씩 더 추상화한 Layer를 가지고 있기 때문임.
+  - POJO : 오래된 방식의 간단한 자바 오브젝트 - 특정 기술에 종속되어 동작하는 것이 아닌 순수한 자바 객체 - Java EE 등 중량 프레임워크들에 사용되는 프레임 워크에 종속된 무거운 객체에 반발해서 사용한 용어 - 객체 지향적인 원리에 충실 - 환경과 기술에 종속되지 않고 필요에 따라 재활용할 수 있는 방식으로 설계됨
+
+### 3-2. 장점
+
+- 기술과의 결합도 감소함
+- 코드 포터빌리티 향상시킬 수 있음.
+- 유지보수성 증가함.
+
+## 참고 자료
+
+https://taeyoungcoding.tistory.com/280
+
+https://velog.io/@ohzzi/Spring-DIIoC-IoC-DI-%EA%B7%B8%EA%B2%8C-%EB%AD%94%EB%8D%B0
+
+https://velog.io/@gillog/Spring-DIDependency-Injection
+
+https://isoomni.tistory.com/entry/TISPRING-IOC-DI-%EC%A0%95%EC%9D%98-%EC%9E%A5%EC%A0%90
+
+https://ss-o.tistory.com/137
