@@ -15,10 +15,7 @@ POJO(Plain Old Java Object)를 기반으로 하는 **IoC/DI**, **AOP**, **PSA** 
 
 ## 의존성이란
 
-<aside>
-💡 전체는 부분에 의존한다
-
-</aside>
+**💡 전체는 부분에 의존한다**
 
 ![Untitled 1](https://github.com/CEOS-Developers/spring-tutorial-18th/assets/48885608/c1a0ded8-399e-4711-813e-08d0758254fe)
 
@@ -36,12 +33,12 @@ Car 에는 Tire 가 필요하다 ( ⇒ 즉, Car 는 Tire 에 의존적이다 )
 
 public class Car {
 
-	Tire tire;
+  Tire tire;
 
-	public Car() {
-		tire = new KoreaTire();
-		// tire = new AmericaTire();
-	}
+  public Car() {
+    tire = new KoreaTire();
+    // tire = new AmericaTire();
+  }
 
 }
 ```
@@ -67,12 +64,12 @@ Car car2 = new Car();
 
 public class Car {
 
-	Tire tire;
+  Tire tire;
 
-	public Car() {
-		// tire = new KoreaTire();
-		tire = new AmericaTire();
-	}
+  public Car() {
+    // tire = new KoreaTire();
+    tire = new AmericaTire();
+  }
 
 }
 ```
@@ -92,11 +89,11 @@ public class Car {
 ```java
 public class Car {
 
-	Tire tire;
+  Tire tire;
 
-	public Car(Tire tire) {
-		this.tire = tire;
-	}
+  public Car(Tire tire) {
+    this.tire = tire;
+  }
 
 }
 ```
@@ -108,11 +105,10 @@ public class Car {
 ```java
 Tire tire = new KoreaTire();
 
-**Car car = new Car(tire); // 생성자 주입**
+Car car = new Car(tire); // 생성자 주입
 ```
 
 ✅ Car 입장에서는 어떤 Tire 를 장착할 지 고민하지 않아도 된다. (책임을 외부에 위임)
-
 ✅ Car 클래스와 Tire 클래스의 **결합이 느슨해진다**
 
 ### setter 주입
@@ -122,11 +118,11 @@ Tire tire = new KoreaTire();
 ```java
 public class Car {
 
-	Tire tire;
+  Tire tire;
 
-	public void setTire(Tire tire) {
-		this.tire = tire
-	}
+  public void setTire(Tire tire) {
+    this.tire = tire
+  }
 
 }
 ```
@@ -138,7 +134,7 @@ Tire tire = new KoreaTire();
 
 Car car = new Car();
 
-**car.setTire(tire); // setter 주입**
+car.setTire(tire); // setter 주입
 ```
 
 ### 필드 주입
@@ -148,8 +144,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class Car {
 
-	@Autowired
-	Tire tire;
+ @Autowired
+ Tire tire;
 
 }
 ```
@@ -215,7 +211,7 @@ DI 가 의존성(new)의 주입이라면, AOP 는 로직(code)의 주입이다.
 ![Untitled 2](https://github.com/CEOS-Developers/spring-tutorial-18th/assets/48885608/29a776fb-ddc6-4464-b09a-65509249b7c7)
 
 - 메서드에 로직을 주입할 수 있는 곳
-  ![Untitled 3](https://github.com/CEOS-Developers/spring-tutorial-18th/assets/48885608/7f5f6390-b0ed-426e-800b-c05db066c450)ㄷ
+  ![Untitled 3](https://github.com/CEOS-Developers/spring-tutorial-18th/assets/48885608/7f5f6390-b0ed-426e-800b-c05db066c450)
   - Around
   - Before
   - After
