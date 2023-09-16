@@ -87,3 +87,66 @@ public class A
 - DI :
   - 모듈 간의 결합도가 낮아짐
     - 모듈 간 유연성이 높아짐
+
+## 2. AOP (Aspect-Oriented Programming)
+
+### 2-1. 개념 정리
+
+- Aspect Oriented Programming의 약자로 관점 지향 프로그래밍이라고 함
+
+  - 모듈화란 어떤 공통된 로직이나 기능을 하나의 단위로 묶는 것
+
+- cross-cutting concerns 를 분리하여 중복 코드를 줄이고 모듈성을 향상시킬 수 있음
+
+```
+class A {
+	method a() {
+    	AAAA
+
+        method a가 하는 일들
+
+        BBBB
+    }
+
+    method b() {
+    	AAAA
+
+        method b가 하는 일들
+
+        BBBB
+    }
+}
+
+class B {
+	method c() {
+    	AAAA
+
+        method c가 하는 일들
+
+        BBBB
+    }
+}
+```
+
+위 같은 경우 같은 일을 하는 AAAA,BBBB가 바뀔 경우 전부 다 찾아서 바꾸어야함
+
+- AOP의 로직 흐름
+  ![](https://velog.velcdn.com/images/aeyongdodam/post/95b568f4-9209-4e69-84cc-a509cadeda34/image.png)
+  출처 : https://engkimbs.tistory.com/746
+
+- Spring AOP는 프록시 디자인 패턴을 사용해서 AOP 효과를 냄.(프록시 패턴을 사용하면 어떤 기능을 추가하려 할때 기존 코드를 변경하지 않고 기능을 추가할 수 있음.)
+
+  - 어떤 클래스가 Spring AOP의 대상이라면 그 기존 클래스의 빈이 만들어질때 Spring AOP가 프록시(기능이 추가된 클래스)를 자동으로 만들고 원본 클래스 대신 프록시를 빈으로 등록함. 그리고 원본 클래스가 사용되는 지점에서 프록시를 대신 사용함
+
+- 주요 개념
+  - Aspect : 위에서 설명한 흩어진 관심사를 모듈화 한 것. 주로 부가기능을 모듈화함.
+  - Target : Aspect를 적용하는 곳 (클래스, 메서드 등)
+  - Advice : 실질적으로 어떤 일을 해야할 지에 대한 것, 실질적인 부가기능을 담은 구현체
+  - JointPoint : Advice가 적용될 위치, 끼어들 수 있는 지점임.
+  - PointCut : JointPoint의 상세한 스펙을 정의한 것임.
+
+### 2-2. 장점
+
+- 코드 중복 감소함
+- 모듈성을 증가시킬 수 있음
+- 흩어진 관심사(cross-cutting concerns)의 분리
