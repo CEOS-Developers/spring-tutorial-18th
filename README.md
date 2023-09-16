@@ -1,8 +1,3 @@
-# spring-tutorial-18th
-CEOS 18th Backend Study - Spring Tutorial
-  
-  
-  
 # CEOS 백엔드 스터디 - 0주차
 
 - Spring Triangle : 스프링의 삼대 요소, **Ioc/DI, AOP, PSA**
