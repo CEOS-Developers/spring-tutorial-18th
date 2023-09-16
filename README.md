@@ -140,13 +140,41 @@ public  class  MemberService {
   
    **(3) Spring Cache**
       - `@Cacheable`, `@CachePut`, `@CacheEvict` 등의 애노테이션으로  캐시 관련 동작을 지정합니다.
+<br></br>
 
+#### 4. Spring Data
+ - 정의
+   - Spring Data란? DB에 대한 특성은 유지하며, 데이터 액세스 방법에 대하여 친숙하고 익숙한 접근 방법을 제시하는 목적을 가진 Spring 기반 프로그래밍 모델입니다.
+ - 특징
+   - Repository라는 제네릭한 인터페이스를 제공하여 공통된 연산에 implementation을 동적으로 제공합니다.
+   - 각 데이터 저장소는 Spring Data의 Repository를 구현하여 자신의 데이터 저장소에 맞는 repository를 제공합니다.
+   - 사용하려는 repository를 상속하여 각 저장소에서 정의한 convention에 맞게 메서드만 선언하기만 하면 Spring Data가 Runtime시 이름에 맞는 적절한 구현 내용을 제공합니다.
+ - 예시
+    - Person 엔터티를 데이터베이스에 저장하고, findByLastName 메서드를 사용하여 데이터를 조회하고 출력합니다.
+
+```Java
+@Entity
+public class Person {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String firstName;
+    private String lastName;
+}
+```
+
+```Java
+public interface PersonRepository extends JpaRepository<Person, Long> {
+    List<Person> findByLastName(String lastName);
+}
+```   
 ---
 #### 🙋‍♀️느낀 점
 이번 주차 스터디를 통해서 Spring의 로직과 개념에 대한 이해를 향상시킬 수 있었습니다.
 이전에 Spring Boot로 프로젝트를 개발한 경험이 있지만 Spring Framework의 핵심적인 동작 원리와 개념에 대한 이해가 부족하다고 느끼고 있었습니다.
 
-IoC/DI로 객체의 생성과 의존성 관리를 스프링 컨테이너에게 위임하여 유연한 코드를 작성할 수 있다는 것을 알게 됐습니다. 또한, AOP를 통해서 핵심 로직과 부가 기능을 분리하여 가독성이 높고 재사용성을 높일 수 있다는 점도 알 수 있었습니다. PSA로는 추상회된 구조를 통해 일관된 방식으로 다양한 기술에 접근할 수 있다는 것도 알게 되었습니다.
+IoC/DI로 객체의 생성과 의존성 관리를 스프링 컨테이너에게 위임하여 유연한 코드를 작성할 수 있다는 것을 알게 됐습니다. 또한, AOP를 통해서 핵심 로직과 부가 기능을 분리하여 가독성이 높고 재사용성을 높일 수 있다는 점도 알 수 있었습니다. PSA로는 추상회된 구조를 통해 일관된 방식으로 다양한 기술에 접근할 수 있다는 것도 알게 되었습니다. 평소 사용했던 Spring Data에 대한 부분도 공식 문서를 통해 다시 정리해볼 수 있었습니다. 
 
 이번 주차에서 배운 내용을 토대로 실제 프로젝트에 적용하여, 효율적이고 안정된 구조의 애플리케이션을 개발하고자 합니다!
 
@@ -166,3 +194,8 @@ AOP
 
 PSA
 - https://gwamssoju.tistory.com/96
+
+Spring Data
+- https://spring.io/projects/spring-data
+- https://ckddn9496.tistory.com/99
+
