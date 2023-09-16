@@ -105,5 +105,5 @@ CEOS 18th Backend Study - Spring Tutorial
 @Controller를 통해 요청을 매핑할 수 있는 컨트롤러 역할을 수행하는 클래스가 된다
 * Spring Transaction   
 @Transaction을 이용해 단순히 메소드에 어노테이션을 붙여줌으로써 트랜잭션 처리가 이루어진다
-* Spring Cache
+* Spring Cache   
 @Cacheable 어노테이션을 붙여줌으로써 구현체를 크게 신경쓰지 않아도 필요에 따라 바꿔 쓸 수 있다 
