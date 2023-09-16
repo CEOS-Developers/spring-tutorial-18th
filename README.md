@@ -179,3 +179,9 @@ https://velog.io/@gillog/Spring-DIDependency-Injection
 https://isoomni.tistory.com/entry/TISPRING-IOC-DI-%EC%A0%95%EC%9D%98-%EC%9E%A5%EC%A0%90
 
 https://ss-o.tistory.com/137
+
+## 느낀점
+
+세 개념 다 들어본 적은 있지만, 흘러가는 것이 아니라 제대로 정리를 한 것은 이번이 처음인 것 같다. 그 과정에서 이것을 왜 쓰는지, 장점은 무엇인지에 대해 파악하려고 노력을 하였다. 그나마 친숙하고 많이 강조되는 AOP 개념에 대해 많은 예제 코드를 찾아보면서 이해하려고 노력하였다.
+
+DI 중에서도 필드 주입, 수정자 주입, 생성자 주입 중 수정자 주입에 대해서는 잘 몰랐는데 이번에 좀 친숙해진 것 같다.
