@@ -120,6 +120,8 @@ public class Car {
 
   Tire tire;
 
+  // @Autowired (스프링 빈에서 주입을 받으려면 setter에 @Autowired 달아줘야 함)
+  // 이 예시에서는 스프링 빈에서 주입받는 것이 아니므로 생략
   public void setTire(Tire tire) {
     this.tire = tire
   }
@@ -127,7 +129,7 @@ public class Car {
 }
 ```
 
-✅ setter 에서 tire 를 받아서 tire 필드를 설정한다.
+✅ setter 에서 tire 를 받아서 tire 필드를 set 해준다.
 
 ```java
 Tire tire = new KoreaTire();
@@ -153,17 +155,88 @@ public class Car {
 ```java
 import org.springframework.stereotype.Component;
 
-@Bean
+@Component
 public class KoreaTire implements Tire {
     // ...
 }
 ```
 
-✅ @Bean 같은 어노테이션을 사용하면 Bean 에 Tire 가 등록된다.
+✅ 클래스에 @Compoent, @Service 등의 어노테이션을 사용하면 Bean 에 Tire 클래스가 등록된다.
 
 ✅ 필드 주입은 한 번 주입된 의존성을 변경하지 않고 유지하는 경우에 적합하다
 
 (cf. @Qualifier 어노테이션을 사용하면 직접 Bean 을 선택할 수 있긴 함)
+
+### 어떤 DI 를 써야하지?
+
+**한 줄 요약 : 생성자 주입을 사용하자**
+
+#### 생성자 주입의 특징
+
+```java
+@Service
+@Transactional(readOnly = true)
+public class UserQueryServiceImpl implements UserQueryService {
+
+    private final UserRepository userRepository;
+
+    public UserQueryServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    // ...
+
+}
+```
+
+Lombok 의 `@RequiredArgsConstructor` 어노테이션을 사용하면 생성자 주입도 간결하게 사용할 수 있다.
+
+```java
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class UserQueryServiceImpl implements UserQueryService {
+
+  private final UserRepository userRepository;
+
+  // ...
+
+}
+```
+
+✅ 첫 번째 코드와 동일한 코드
+
+**✅ 의존성 주입 시 `final` 을 붙여주는 의미 :**
+
+1. 불변성을 유지해서 멀티스레딩 환경에서의 동시성 문제 등의 side-effects 를 방지
+2. final 필드로 선언된 의존성이 주입되지 않으면 컴파일 시점에 에러가 남으로써 코드 안정성 향상
+
+**✅ 순환 참조 방지 :**
+생성자 주입에서 순환 참조가 발생할 경우 컴파일 시점에 에러를 잡아줌으로써 안정성 향상
+
+**✅ 테스트 코드 작성이 용이 :**
+의존성을 명시적으로 주입할 수 있어서 유닛테스트 작성이 용이함
+
+#### setter 주입의 특징
+
+- 장점
+
+  - 선택적으로 의존성을 주입할 수 있는 장점이 있음 (생성자 주입은 무조건 주입해줘야 함)
+
+- 단점
+  - 불변성을 보장하지 않는다.
+  - 의존성이 런타임 도중 변경될 수 있어서 예측 불가능하다.
+  - 모든 의존성이 주입되었는지 확인이 어려워서 테스트하기 어렵다.
+
+#### 필드 주입의 특징
+
+- 장점
+
+  - 코드가 간결하고 읽기 쉽다. (`@Autowired` 하나면 끝)
+
+- 단점
+  - 불변성을 보장하지 않는다.
+  - 테스트용 의존성 주입이 어렵다.
 
 ## IoC 란?
 
@@ -227,3 +300,11 @@ DI 가 의존성(new)의 주입이라면, AOP 는 로직(code)의 주입이다.
 어댑터 패턴을 적용해서 같은 일을 하는 다수의 기술을 공통의 인터페이스로 제어할 수 있게 한 것을 PSA(일관성 있는 서비스 추상화) 라고 한다.
 
 예를 들어 MySQL, PostgreSQL 등 다른 기술들을 사용하더라도 JDBC 라는 공통의 표준 스펙(인터페이스)을 통해서 공통된 방식으로 코드를 작성할 수 있다.
+
+---
+
+# 느낀 점 및 회고
+
+- 오랜만에 개념적인 부분을 되짚어볼 수 있어서 도움이 되었다.
+- 생성자 주입 vs. setter 주입 vs. 필드 주입 각각의 장단점에 대해서 더 깊게 공부해봐야 한다.
+- AOP의 개념은 알고 있지만, 추후 프로젝트 시 코드 레벨에 직접 적용해보고 싶다
