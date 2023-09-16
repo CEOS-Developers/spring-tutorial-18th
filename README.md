@@ -1,4 +1,5 @@
-# CEOS 18th Backend Study - spring-tutorial
+# 💙 CEOS 18th Backend Study 💙
+> Spring tutorial
 
 ## ⭐ Spring의 POJO란 무엇인가?
 POJO는 Plain Old Java Object 의 약자로 getter, setter처럼 기본적인 기능만 가진 자바 객체를 의미한다.
@@ -9,7 +10,7 @@ POJO는 Plain Old Java Object 의 약자로 getter, setter처럼 기본적인 �
 
 ``` JAVA
 public void  DBTest() {
-    String serverURL = "jdbc:mysql://localhost:3306/sys";    //    주소:포트/db명
+    String serverURL = "jdbc:mysql://localhost:3306/sys";    // 주소:포트/db명
     String id = "root"; // 계정명
     String pw = "1234"; // 비밀번호
 
@@ -49,7 +50,7 @@ public void DBTest() {
 <br><br>
 ![캡처](https://github.com/nzeong/Web-3.0/assets/121355994/87901c5c-af9a-4eae-98b1-f2cfd42a6c8c)
 <br><br>
-이제 POJO 프로그래밍을 가능하게 하는 3가지 기술에 대해 알아보자.
+이제 POJO 프로그래밍을 가능하게 하는 <b>3가지 기술</b>에 대해 알아보자.
 
 ## 🌟 IoC/DI
 
@@ -100,7 +101,7 @@ class B_2 {
 
 }
 ```
-위 코드를 보면 class A가 class B의 메서드를 사용하고 있다. 이런 관계를 A가 B에 의존하고 있다고 한다. 왜냐하면 B의 로직에 따라 A가 영향을 받기 때문이다. 이렇게 코드를 짰을 때의 문제점은 class A가 본인이 가지고 있는 method의 로직만 신경쓰면 되는 것이 아니라 B interface의 어떤 구현 클래스를 사용할지까지도 결정해야 한다는 점이다. 즉, A class는 본인의 로직에 대한 책임뿐만 아니라 B class의 구현에 대한 책임까지 지고 있는 것이다. 이렇게 되면 좋은 객체지향설계의 원칙(SOLID) 중에서도 OCP, DIP원칙에 어긋나게 된다. 따라서 이 의존관계의 구현을 제 3자에게 위임해야 하고, 이를 IoC/DI라고 부른다. 
+위 코드를 보면 class A가 class B의 메서드를 사용하고 있다. 이런 관계를 <b>A가 B에 의존하고 있다</b>고 한다. 왜냐하면 B의 로직에 따라 A가 영향을 받기 때문이다. 이렇게 코드를 짰을 때의 문제점은 class A가 본인이 가지고 있는 method의 로직만 신경쓰면 되는 것이 아니라 B interface의 어떤 구현 클래스를 사용할지까지도 결정해야 한다는 점이다. 즉, A class는 본인의 로직에 대한 책임뿐만 아니라 B class의 구현에 대한 책임까지 지고 있는 것이다. 이렇게 되면 좋은 객체지향설계의 원칙(SOLID) 중에서도 OCP, DIP원칙에 어긋나게 된다. 따라서 이 <b>의존관계의 구현을 제 3자에게 위임해야</b> 하고, 이를 <b>IoC/DI</b>라고 부른다. 
 
 ```JAVA
 public class Factory {
@@ -118,15 +119,48 @@ public class A {
 
     private B b;
 
-    public A() {
-        b = new Factory().b();
+    public A(B b) {
+        this.b = b;
     }
-    ..이하 동일..
 }
 ```
 이제 Factory class(제 3자)에서 B에 대한 return을 받아 A의 멤버변수 B에 주입한다. 현재는 B_1 class를 구현으로 사용하고 있지만 추후 변경된다면 class A는 변경할 필요가 없으며 Factory Class의 B에 대한 return 부분을 return new B_2()로 변경하기만 하면 된다. 이렇게 책임에 대한 분리가 이루어졌다.
 <br><br>
-Spring에서는 스프링 컨테이너와 스프링 빈이라는 기능을 제공하여 IoC/DI 기능을 쉽게 구현할 수 있다.
+Spring에서는 <b>스프링 컨테이너와 스프링 빈</b>이라는 기능을 제공하여 IoC/DI 기능을 쉽게 구현할 수 있다. 컴포넌트 스캔(@Component)을 통해 스프링 컨테이너에 등록된 자바 객체들을 스프링 빈이라고 하고, 스트링 빈들을 자동의존관계 주입(@Autowired)을 통해 연결해주면서 의존성을 주입하게 된다.
+
+```JAVA
+@Component 
+public class FixDiscountPolicy implements DiscountPolicy{
+
+    @Override
+    public int discount(Member member, int price) {
+        이하생략
+    }
+}
+```
+
+인터페이스 DiscountPolicy의 구현체인 FixDiscountPolicy를 OrderServiceImpl에 주입해줄 것이기에 @Component를 통해 위 클래스를 스프링 빈으로 등록해주었다.
+
+```JAVA
+@Component // 해당 클래스를 스프링 빈으로 등록
+public class OrderServiceImpl implements OrderService{
+
+    private final DiscountPolicy discountPolicy; // 인터페이스에 의존
+
+    @Autowired // 생성자 주입을 통해 구체적인 구현체 설정해주기(이 경우 위에서 스프링 빈으로 등록한 FixDiscountPolicy가 주입)
+    public OrderServiceImpl(DiscountPolicy discountPolicy) {
+        this.discountPolicy = discountPolicy; // 인터페이스에 의존
+    }
+
+    @Override
+    public Order createOrder(Long memberId, String itemName, int itemPrice) {
+        int discountPrice = discountPolicy.discount(itemPrice);
+        return new Order(memberId, itemName, itemPrice, discountPrice);
+    }
+}
+```
+보통 위처럼 <b>생성자 주입</b>을 이용해서 의존관계 주입을 해주는 경우가 많다. 
+
 
 ## 🌟 AOP
 AOP는 Aspect Oriented Programming의 약자로 <b>관점 지향 프로그래밍</b>이라고 불린다. 관점 지향 프로그래밍은 어떤 기능을 핵심적인 관점(Core Concern)과 공통적인 관점(Cross-Cutting Concern)으로 분리시켜서 보고, 그 관점을 기준으로 각각을 모듈화하겠다는 것이다. 업무 로직을 포함하는 기능을 핵심 기능(Core Concern), 소스 코드상에서 다른 부분에 계속 반복해서 쓰는 코드들을 <b>공통 기능(Cross-Cutting Concern)</b>이라고 한다. AOP에서는 이 공통 기능을 <b>애스팩트(Aspect)</b>로 정의하여 핵심 기능에서 공통 기능을 분리함으로써 핵심 기능을 설계하고 구현할 때 객체지향적인 가치를 지킬 수 있게 도와준다. 
