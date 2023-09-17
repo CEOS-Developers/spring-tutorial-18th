@@ -87,15 +87,69 @@ class Client {
 • 스프링은 런타임에 AOP를 적용하여 실제 대상 코드는 그대로 유지되고 프록시를 통해 부가 기능이 적용된다.<br>
 • 프록시는 메서드 오버라이딩 개념으로 동작하기 때문에 메서드에만 적용할 수 있다. <br>
 <img width="350" alt="springcontainer" src="https://github.com/jongmee/spring-tutorial-18th/assets/101439796/7acd4d3d-3c66-4c6c-9266-d53e17f70361"><br>
-• AOP 용어:<br>
-◦ Advice: 실질적인 부가 기능 로직을 정의하는 곳<br>
-◦ Join point: Advice가 적용될 수 있는 모든 위치 ex. 메서드 실행 시점, 생성자 호출 시점, 필드 값 접근 시점 등등<br>
-◦ Pointcut: 조인 포인트 중에서 Advice가 적용될 위치를 선별하는 기능. 스프링 AOP는 프록시 기반이기에 메서드 실행 시점만 가능<br>
-◦ Advisor: 스프링 AOP에서만 사용되는 용어로 Advice + Pointcut 한 쌍<br>
-◦ Aspect: Advice + Pointcut을 모듈화 한 것. (@Aspect) <br>
-<img width="400" alt="springcontainer" src="https://github.com/jongmee/spring-tutorial-18th/assets/101439796/ac63c82b-8fdb-455f-b250-e167866901e5"><br>
+</p>
+<div align="center">
+      
+|AOP 용어|설명|
+|:--------|:--------:|
+|Advice|실질적인 부가 기능 로직을 정의하는 곳|
+|Join point|Advice가 적용될 수 있는 모든 위치 ex. 메서드 실행 시점, 생성자 호출 시점, 필드 값 접근 시점 등등|
+|Pointcut|조인 포인트 중에서 Advice가 적용될 위치를 선별하는 기능. 스프링 AOP는 프록시 기반이기에 메서드 실행 시점만 가능|
+|Advisor|스프링 AOP에서만 사용되는 용어로 Advice + Pointcut 한 쌍|
+|Aspect|Advice + Pointcut을 모듈화 한 것. (@Aspect)|
+
+</div>
+
+<p align="center">
+<img width="500" alt="springcontainer" src="https://github.com/jongmee/spring-tutorial-18th/assets/101439796/ac63c82b-8fdb-455f-b250-e167866901e5"><br>
 • 스프링에서는 Advice에 관련된 5가지 애노테이션을 제공하는데,<br> @Around, @Before, @AfterReturning, @AfterThrowing, @After이다.<br>
 </p>
+
+
+```java
+@Slf4j
+@Aspect
+@Component
+public class LogAop {
+
+    // com.aop.controller 이하 패키지의 모든 클래스의 모든 메서드
+    @Pointcut("execution(* com.aop.controller..*.*(..))")
+    private void cut(){}
+
+    // Advice
+    @Before("cut()")
+    public void beforeParameterLog(JoinPoint joinPoint) {
+        
+        Method method = getMethod(joinPoint);
+        log.info("======= method name = {} =======", method.getName());
+
+        Object[] args = joinPoint.getArgs();
+        if (args.length <= 0) log.info("no parameter");
+        for (Object arg : args) {
+            log.info("parameter type = {}", arg.getClass().getSimpleName());
+            log.info("parameter value = {}", arg);
+        }
+    }
+
+    // Advice
+    @AfterReturning(value = "cut()", returning = "returnObj")
+    public void afterReturnLog(JoinPoint joinPoint, Object returnObj) {
+        
+        Method method = getMethod(joinPoint);
+        log.info("======= method name = {} =======", method.getName());
+
+        log.info("return type = {}", returnObj.getClass().getSimpleName());
+        log.info("return value = {}", returnObj);
+    }
+
+    // 메서드 정보 가져오기
+    private Method getMethod(JoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        return signature.getMethod();
+    }
+}
+```
+
 <h2 align="center">
 🌼 PSA
 </h2>
