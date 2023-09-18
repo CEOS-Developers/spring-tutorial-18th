@@ -69,7 +69,7 @@
                         
                           @Autowired
                           public Client(Pasta pasta) {
-                            this.pasta = past;
+                            this.pasta = pasta;
                           }
                         }
 ```
