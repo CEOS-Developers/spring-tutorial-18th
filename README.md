@@ -98,3 +98,5 @@ public class A {
 [스프링의 콘셉트(IoC, DI, AOP, PSA) 쉽게 이해하기](https://shinsunyoung.tistory.com/133)
 
 [스프링의 3가지 핵심 프로그래밍 모델](https://velog.io/@mon99745/스프링의-3가지-핵심-프로그래밍-모델)
+
+[토비의 스프링 3.1 Vol. 1 스프링의 이해와 원리](http://www.acornpub.co.kr/book/toby-spring3.1-vol1)
