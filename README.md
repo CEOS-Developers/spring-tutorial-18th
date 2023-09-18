@@ -1,6 +1,32 @@
-# Spring 핵심 프로그래밍 모델
+# POJO 프로그래밍
 
-## IoC (Inversion of Control)
+> ```스프링의 특징과 목표```
+>
+>분리됐지만 반드시 필요한 엔터프라이즈 서비스 기술을 POJO 방식으로 개발된 애플리케이션 핵심 로직을 담은 코드에 제공한다.
+
+## POJO
+![image](https://github.com/gmkim20713/spring-study/assets/68195241/0351cc22-0d78-48ba-ba3e-ec8cf1dd9828)
+
+- POJO = Plain Old Java Object
+- 스프링 애플리케이션은 POJO를 이용해서 만든 **애플리케이션 코드**와, POJO가 어떻게 관계를 맺고 동작하는지를 정의해놓은 **설계정보**로 구분된다.
+- POJO로 개발할 수 있게 해주는 가능기술(Enabling Technology)
+  - IoC/DI
+  - AOP
+  - PSA
+
+## POJO의 조건
+- 특정 규약에 종속되지 않는다.
+- 특정 환경에 종속되지 않는다.
+## POJO의 장점
+- 특정한 기술과 환경에 종속되지 않는다.
+- 자동화된 테스트에 유리하다.
+- 객체지향적인 설계를 자유롭게 적용할 수 있다.
+## POJO 프레임워크
+- POJO 프로그래밍이 가능하도록 기술적인 기반을 제공하는 프레임워크 = POJO 프레임워크
+  - Ex) 스프링 프레임워크, 하이버네이트
+
+
+# IoC (Inversion of Control)
 
 > 제어의 역전
 >
@@ -19,7 +45,7 @@ public class A {
 }
 ```
 
-## DI (Dependency Injection)
+# DI (Dependency Injection)
 
 > 의존성 주입
 >
@@ -43,7 +69,7 @@ public class A {
 }
 ```
 
-## AOP (Aspect Oriented Programming)
+# AOP (Aspect Oriented Programming)
 
 > 관점 지향 프로그래밍; 프로그래밍을 할 때 핵심 관점 & 부가 관점으로 나누어 개발(모듈화)하는 것
 >
@@ -57,7 +83,7 @@ public class A {
 
 ![image](https://github.com/CEOS-Developers/spring-tutorial-18th/assets/68195241/a758b7ac-9fc7-4c8c-8417-ac01e693305b)
 
-## PSA (Portable Service Abstraction)
+# PSA (Portable Service Abstraction)
 
 > 이식 가능한(일관성 있는) 서비스 추상화; 어느 기술을 사용하든 일관된 방식으로 처리하도록 하는 것
 >
@@ -68,7 +94,7 @@ public class A {
     - Spring Transaction
     - Spring Cache
 
-## 참고 자료
+# 참고 자료
 [스프링의 콘셉트(IoC, DI, AOP, PSA) 쉽게 이해하기](https://shinsunyoung.tistory.com/133)
 
 [스프링의 3가지 핵심 프로그래밍 모델](https://velog.io/@mon99745/스프링의-3가지-핵심-프로그래밍-모델)
