@@ -27,23 +27,42 @@
 
 
 # IoC (Inversion of Control)
+> ```Inversion_of_Control``` ```제어의_역전```
 
-> 제어의 역전
->
-- 객체의 생성과 관리를 개발자가 하는 것이 아니라 프레임워크가 대신하는 것
+- 객체의 생성과 관리를 개발자가 하는 것이 아니라 프레임워크가 대신하는 것  
 - 스프링 컨테이너가 필요에 따라 개발자 대신 Bean들을 제어
-
-```java
-// 객체 생성
+  
+```java  
+// 개발자가 제어하는 경우
 public class A {
-	b = new B();
-}
-
-// 객체 생성 x, 객체 할당 (가져와 사용)
+    private B b;
+ 
+    public A() {
+        b = new B();
+    }
+} 
+  
+// 프레임워크가 제어하는 경우
 public class A {
-	private B b;
+    
+    @Autowired
+    private B b; // 필드 주입방식
 }
 ```
+
+## IoC가 필요한 이유
+- 역할과 관심을 분리 -> 응집도 증가 & 결합도 감소 -> 유연한 코드 작성 가능
+- 프로그램의 진행 흐름과 구체적인 구현 분리
+- 비즈니스 로직에 집중
+- 객체 간 의존성 낮아짐
+
+## IoC를 구현하는 Pattern
+- Service Locator
+- Factory
+- Abstract Factory
+- Strategy
+- **Template Method**
+- **Dependency Injection**
 
 # DI (Dependency Injection)
 
