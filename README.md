@@ -63,15 +63,15 @@
 • 스프링에서는 DI를 @Autowired 를 통해 수행한다. <br></p>
 
 ```java
-@Configuration
-class Client {
-  private Pasta pasta;
-
-  @Autowired
-  public Client(Pasta pasta) {
-    this.pasta = past;
-  }
-}
+                        @Configuration
+                        class Client {
+                          private Pasta pasta;
+                        
+                          @Autowired
+                          public Client(Pasta pasta) {
+                            this.pasta = past;
+                          }
+                        }
 ```
 <p align="center">
 • @Autowired가 적용된 변수 및 메서드에 스프링이 관리하는 Bean을 자동으로 매핑해준다.<br>
@@ -84,12 +84,56 @@ class Client {
 • 핵심적인 관점(핵심 비즈니스 로직), 부가적인 관점으로 나누어서 로직을 모듈화한다.<br>
 • 애플리케이션 전체에 걸쳐 사용되는 부가 기능을 모듈화하여 재사용할 수 있도록 지원하는 것이다.<br>
 • OOP는 비즈니스 로직의 모듈화라면, AOP는 <b>인프라 혹은 부가 기능의 모듈화</b>이다. <br>ex. 로깅, 동기화, 오류 검사, 성능 최적(캐싱) 등<br>
-• 스프링은 런타임에 AOP를 적용하여 실제 대상 코드는 그대로 유지되고 프록시를 통해 부가 기능이 적용된다.<br>
 • 프록시는 메서드 오버라이딩 개념으로 동작하기 때문에 메서드에만 적용할 수 있다. <br>
+</p>
+
+<p align="center">
+❓<b>프록시란?</b><br>
+제어 흐름을 조정하기 위한 목적으로 중간에 <b>대리자</b>를 두는 디자인 패턴
+</p>
+<p align="center">
 <img width="350" alt="springcontainer" src="https://github.com/jongmee/spring-tutorial-18th/assets/101439796/7acd4d3d-3c66-4c6c-9266-d53e17f70361"><br>
 </p>
+
+
+
+```java
+                    public interface IService{
+                        String runSomething();
+                    }
+                    
+                    public class Service implements IService{
+                      public String runSomething(){
+                        return "Run Service\n";
+                      }
+                    }
+                    
+                    public class Proxy implements IService{
+                      IService iservice;
+                    
+                      public String runSomething(){
+                        // 흐름 제어가 주목적. 반환 결과를 그대로 전달
+                        iservice = new Service();
+                        return iservice.runSomething();
+                      }
+                    }
+                    
+                    public class ClientWithProxy{
+                      public static void main(String[] args){
+                        // 프록시를 이용한 호출
+                        IService proxy = new Proxy();
+                        System.out.println(proxy.runSomething());
+                      }
+                    }
+
+
+```
+<p align="center">
+AOP는 핵심 모듈 사이에 필요한 기능을 삽입하여 적절한 타이밍에 호출되도록 해주는 기능인데, 스프링은 대상 빈을 <b>프록시</b>로 감싸는 방법을 사용한다. 
+즉, 스프링 AOP는 <b>런타임에 프록시 인스턴스가 동적으로 변경되는</b> 다이나믹 프록시 기법으로 구현되어있다. 실제 Bean 대신 프록시 Bean을 등록한다. 모두 <b>동일한 인터페이스의 구현체 혹은 클래스의 확장</b>이기에 가능하다. 프록시를 통해 흐름을 제어하고 부가 기능을 추가할 수 있다.
+</p>
 <div align="center">
-      
+
 |AOP 용어|설명|
 |:--------|:--------:|
 |Advice|실질적인 부가 기능 로직을 정의하는 곳|
@@ -101,7 +145,6 @@ class Client {
 </div>
 
 <p align="center">
-<img width="500" alt="springcontainer" src="https://github.com/jongmee/spring-tutorial-18th/assets/101439796/ac63c82b-8fdb-455f-b250-e167866901e5"><br>
 • 스프링에서는 Advice에 관련된 5가지 애노테이션을 제공하는데,<br> @Around, @Before, @AfterReturning, @AfterThrowing, @After이다.<br>
 </p>
 
