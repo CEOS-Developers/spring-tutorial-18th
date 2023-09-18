@@ -65,28 +65,62 @@ public class A {
 - **Dependency Injection**
 
 # DI (Dependency Injection)
+> ```Dependency Injection``` ```의존관계 주입```
 
-> 의존성 주입
->
-- IoC 구현을 위해 사용하는 방법 =  DI
-- 의존성 : 한 객체가 다른 객체를 사용할 때
-- 외부에서 객체를 주입받아 사용(두 객체 간의 관계를 결정)하는 것
-- 사용 목적 : 높은 응집성과 낮은 결합도
-    - 클래스 레벨에서는 의존관계가 고정 X
-    - 런타임 시에 관계를 주입 → 유연성을 확보하고 결합도를 낮춤
-- 장점
-    - 관심사 분리
-    - 테스트 작성 용이
-    - 개방폐쇄의 원칙(OCP)
-- **`@Autowired`** : 스프링 컨테이터 빈 주입
+- IoC 구현을 위해 사용하는 디자인 패턴
+- 객체의 의존관계를 외부에서 주입시키는 패턴
+	- 의존관계 : 한 객체가 다른 객체를 사용
 
-```java
-// 객체 주입, 객체 생성 x
-public class A {
+## DI의 조건
+1. 클래스 모델이나 코드에는 런타임 시점의 의존관계가 드러나지 않는다. 그러기 위해서는 인터페이스에만 의존하고 있어야 한다.
+2. 런타임 시점의 의존관계는 컨테이너나 팩토리 같은 제3의 존재가 결정한다.
+3. 의존관계는 사용할 오브젝트에 대한 레퍼런스를 외부에서 제공(주입)해줌으로써 만들어진다.
+
+## DI가 필요한 이유
+- 높은 응집성과 낮은 결합도
+	- 클래스 레벨에서는 의존관계가 고정 X
+	- 런타임 시에 관계를 주입 → 유연성을 확보하고 결합도를 낮춤
+
+## DI의 장점
+- 관심사 분리
+- 테스트 작성 용이
+- 개방폐쇄의 원칙(OCP)
+
+## DI 유형
+- @Autowired
+	```java
 	@Autowired
-	B b;
-}
-```
+	private TestDAO testDAO;
+	```
+- Field Injection : @Autowired를 필드 내에 직접 주입
+	- 문제 : 외부 접근 불가 (테스트 시 객체 수정 불가), 순환 참조
+	```java
+	public class TestController {
+		@Autowired
+		private TestService testService;
+	}
+	```
+- Setter Injection : 수정자를 통해 의존성 주입
+	- 문제 : public 메서드이기 때문에 주입받는 객체의 변경이 될 수 있음
+	```java
+	private TestDAO testDAO;
+	@Autowired
+	public void setTestDao(TestDAO testDAO) {
+		this.testDAO = testDAO;
+	}
+	```
+- Constructor Injection : 생성자 주입 ```권장```
+	```java
+	@RESTController
+	public class TestController {
+		private TestService testService;
+
+		@Autowired
+		public TestController(TestService testService) {
+			this.testService = testService
+		}
+	}
+	```
 
 # AOP (Aspect Oriented Programming)
 
