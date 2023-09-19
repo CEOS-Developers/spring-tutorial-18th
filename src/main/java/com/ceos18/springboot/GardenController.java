@@ -8,7 +8,7 @@ public class GardenController {
 
   @GetMapping("/")
   public String index() {
-    return "Welcome to My Garden in Spring 🌷";
+    return "Welcome to My Garden in Spring!";
   }
 
 }
