@@ -1,2 +1,164 @@
-# spring-tutorial-18th
-CEOS 18th Backend Study - Spring Tutorial
+# CEOS 18th Backend Study - 0주차 미션
+Spring이 지원하는 기술들(IoC/DI, AOP, PSA 등)을 자유롭게 조사합니다.
+
+## IoC/DI
+
+IoC은 Inversion of Control의 약자로, 제어의 역전을 의미한다. 프로그램의 제어 흐름을 직접 제어하는 것이 아니라 외부에서 관리하는 것이다.
+
+기존의 프로그램은 클라이언트 입장의 구현 객체가 서버 입장의 구현 객체를 <b>직접 생성하여 연결 및 실행</b>하였다. 다음과 같은 OrderServiceImpl이 있다.
+
+```
+public class OrderServiceImpl {
+
+  private final MemberRepository memberRepository = new MemoryMemberRepository();
+
+  private final DiscountPolicy discountPolicy = new FixDiscountPolicy();
+
+}
+```
+
+위 코드에서 OrderServiceImpl은 MemoryMemberRepository, FixDiscountPolicy를 사용하는 클라이언트 입장의 구현 객체이고, MemoryMemberRepository, FixDiscountPolicy은 서버 입장의 구현 객체이다. 이때, OrderServiceImpl은 직접 구현체를 생성하여 연결 및 실행하므로 프로그램의 제어 흐름을 직접 제어하고 있다. 
+
+현재 할인 정책은 FixDiscountPolicy로, 고정 금액 할인이 이루어진다. 그런데 만약 주문 가격 대비 %로 할인을 할 수 있도록 정책을 변경하려면 어떻게 해야할까? 다음과 같이 클라이언트인 OrderServiceImpl의 코드를 고쳐야 한다.
+
+```
+public class OrderServiceImpl {
+
+  private final MemberRepository memberRepository = new MemoryMemberRepository();
+
+///  private final DiscountPolicy discountPolicy = new FixDiscountPolicy();
+  private final DiscountPolicy discountPolicy = new RateDiscountPolicy();
+
+}
+```
+
+하지만 위와 같은 코드가 좋은 코드는 아니다. 좋은 객체 지향 설계의 5가지 원칙(SOLID) 중 OCP와 DIP를 위반하고 있기 때문이다.
+
+- OCP(Open/Closed Principle) : 개방-폐쇄 원칙으로, 소프트웨어 요소가 확장에는 열려있으나 변경에는 닫혀있어야 함을 의미한다. 즉, 기존의 코드를 변경하지 않으면서(Closed), 기능을 추가할 수 있도록(Open) 설계가 되어야 한다는 원칙이다.
+
+- DIP(Dependency Inversion Principle) : 의존관계 역전 원칙으로, 구체화에 의존하지 않고 추상화에 의존해야 함을 의미한다. 즉, 클라이언트가 구현 클래스에 의존하지 않고, 인터페이스에 의존해야 한다는 원칙이다.
+
+해결을 위해 OrderServiceImpl이 인터페이스에만 의존하도록 코드를 변경한다.
+
+```
+public class OrderServiceImpl {
+
+  private final MemberRepository memberRepository;
+  private final DiscountPolicy discountPolicy;
+
+  public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+
+    this.memberRepository = memberRepository;
+    this.discountPolicy = discountPolicy;
+  }
+}
+```
+이 경우, OrderServiceImpl이 의존하고 있는 인터페이스의 구현 객체는 생성자를 통해 <b>외부에서 대신 생성하여 주입</b>해준다. 이것을 DI(Dependency Injection), 의존관계 주입 또는 의존성 주입이라고 한다.
+
+이렇게 되면 OrderServiceImpl은 오직 자신의 로직을 실행하는 역할만 담당한다. 프로그램의 제어 흐름은 인터페이스의 구현 객체를 생성하고 주입하는 쪽에서 가져가는 것이다. 이것을 IoC(Inversion of Control), 제어의 역전이라고 한다.
+
+객체를 생생하고 관리하면서 의존관계를 연결해주는 겻을 IoC 컨테이너 또는 DI 컨테이너라고 한다. 스프링의 경우, @Bean이 붙은 메서드를 호출하여 반환된 객체를 <b>스프링 컨테이너</b>에 등록한다. 스프링 컨테이너에 등록된 객체를 <b>스프링 빈</b>이라고 한다.
+
+### 참고 
+- https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%ED%95%B5%EC%8B%AC-%EC%9B%90%EB%A6%AC-%EA%B8%B0%EB%B3%B8%ED%8E%B8
+- https://pangtrue.tistory.com/228
+- https://hckcksrl.medium.com/solid-%EC%9B%90%EC%B9%99-182f04d0d2b
+
+## AOP
+
+AOP는 Aspect Oriented Programming의 약자로, 관점 지향 프로그래밍을 의미한다. 어떤 로직을 기준으로 핵심적인 관점, 부가적인 관점으로 나누어서 보고 그 관점을 기준으로 공통된 로직이나 기능을 하나의 단위로 묶는다.
+
+프로그램에는 핵심적인 비즈니스 로직이 포함되는 <b>핵심 관심 사항(core concern)</b>이 있고, 프로그램 전체에 반복적으로 적용되는 공통적인 부가 기능 로직이 포함되는 <b>공통 관심 사항(cross-cutting concern)</b>이 있다.
+
+공통 관심 사항의 코드를 핵심 관심 사항의 코드와 분리하여, 코드의 간결성을 높이고 유연한 변경과 무한한 확장이 가능하도록 하는 것이 AOP의 목적이다.
+
+AOP를 적용하는 방식에는 어느 시점에 적용하느냐에 따라 컴파일 시점 적용, 클래스 로딩 시점 적용, 런타임 시점 적용이 있으며, 스프링은 런타임 시점 적용 방식을 사용한다.
+
+런타임 시점 적용은 컴파일, 클래스 로딩, main() 메서드의 실행 이후에 자바가 제공하는 범위 내에서 부가 기능을 적용하는 방식이다. 이미 런타임 중이므로 코드를 조작하기 어려워 여러 개념과 기능을 활용하여 프록시를 통해 부가 기능을 적용한다.
+
+프록시는 메서드 실행 시점에서만 다음 타겟을 호출할 수 있기 때문에, 런타임 시점에 부가기능을 적용하는 방식은 메서드의 실행 지점으로 제한된다.
+
+예를 들어, MemberController, MemberService, MemberRepository 내 메서드의 호출 시간을 측정하고 싶다고 하면 가장 기본적인 방법은 각각의 메서드에 시간 측정 로직을 추가하는 것이다.
+
+```
+public class MemberService {
+  public Long join(Member member) {
+
+    long start = System.currentTimeMillis(); // 호출 시작 시간
+
+    // 회원 가입 로직
+
+    long finish = System.currentTimeMillis(); // 호출 종료 시간
+    long timeMs = finish - start; // 호출 소요 시간
+  }
+
+  public List<Member> findMembers() {
+
+    long start = System.currentTimeMillis(); // 호출 시작 시간
+
+    // 전체 회원 조회 로직
+
+    long finish = System.currentTimeMillis(); // 호출 종료 시간
+    long timeMs = finish - start; // 호출 소요 시간
+  }
+}
+```
+
+이때, AOP를 적용하면 회원 가입, 회원 조회 등의 핵심 관심 사항과 호출 소요 시간을 측정하는 공통 관심 사항을 분리할 수 있다. 이때, 다음과 같이 시간을 측정하는 로직을 별도의 공통 로직으로 만들어 원하는 적용 대상에 적용한다.
+
+```
+@Component
+@Aspect
+public class TimeTraceAop {
+
+  @Around("execution(* hello.hellospring..*(..))") // 원하는 적용 대상 선택
+  public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+
+    long start = System.currentTimeMillis();
+
+    System.out.println("START: " + joinPoint.toString());
+
+    try {
+      return joinPoint.proceed();
+    } finally {
+      long finish = System.currentTimeMillis();
+      long timeMs = finish - start;
+
+      System.out.println("END: " + joinPoint.toString()+ " " + timeMs + "ms");
+    }
+  }
+}
+```
+
+프록시는 AOP 적용 대상(타겟)을 감싸서 타겟의 요청을 대신 처리한다. 클라이언트에서 타겟을 호출하면 타겟을 감싸고 있는 프록시가 호출되어 타겟 메소드 실행전에 선처리, 타겟 메소드 실행 후 후처리를 실행시키도록 구성되어 있다. 즉, 프록시는 호출을 가로채 부가 기능을 수행 후 원래의 타겟 메소드를 호출한다.
+
+### 참고
+- https://velog.io/@kai6666/Spring-Spring-AOP-%EA%B0%9C%EB%85%90
+- https://engkimbs.tistory.com/746
+- https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%EC%9E%85%EB%AC%B8-%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8
+- https://n1tjrgns.tistory.com/261
+
+## PSA
+
+추상화 계층을 사용하여 어떤 기술을 내부에 숨기고 개발자가 추상화 계층만으로도 기술을 사용할 수 있도록 편의성을 제공해주는 것을 서비스 추상화(Service Abstraction)라고 한다. 예를 들어, @Transactional 어노테이션을 선언하는 것만으로 별도의 코드 추가 없이 트랜잭션 서비스를 사용할 수 있다.
+
+트랜잭션 서비스를 사용하는 동안 DB에 접근하게 되는데, 어떠한 방식으로 접근하더라도 개발자는 @Transactional 어노테이션을 이용하면 트랜잭션을 유지할 수 있다.
+
+스프링에서는 데이터를 캐싱하고 싶을 때 @Cacheable 어노테이션을 사용한다. 이때, 캐시를 로컬캐시에서 Redis로 바꾸고 싶다면 캐싱에 대한 비즈니스 로직을 모두 수정할 필요없이 CacheManager만 RedisCacheManager로 교체해주면 된다.
+
+이렇게 환경의 변화와 관계없이 일관된 방식의 기술로의 접근 환경을 제공하는 추상화 구조를 PSA(Portable Service Abstraction)라고 한다.
+
+PSA가 가능한 것은 추상화 계층이 존재하기 때문이다. 모든 CacheManager는 공통적인 인터페이스를 가지고 있기 때문에 해당 인터페이스를 구현하는 어떤 것으로 대체되든 프로그램에 영향이 없어지는 것이다. 이러한 점에서 PSA는 확장에는 열려있고 수정에는 닫혀있어야 한다는 OCP의 대표적인 예시라고 할 수 있다.
+ 
+
+### 참고
+- https://sabarada.tistory.com/127
+- https://ch4njun.tistory.com/270
+
+## 새롭게 알게 된 점, 느낀 점
+
+IoC/DI와 AOP는 이전에 스프링을 공부하면서 공부한 내용이라 새롭지는 않았지만, 오랜만에 복습을 하게 되어 다시 한번 개념을 차근차근 정리할 수 있었다. AOP의 경우, 처음 공부하고나서 여러 번 프로젝트에 참여했지만 이 기술을 사용한 적은 한 번도 없었다. 언젠가는 한 번쯤 사용해보고 싶다.
+
+PSA는 이번 과제를 통해 처음 공부해보게 된 개념이다. 단어 자체는 아주 생소했지만 막상 공부해보니 개념 자체는 그리 낯설지 않았다. 이러한 개념이 따로 존재한다는 것을 몰랐을 뿐이지 스프링을 사용하다보면 앞서 언급한 예시들과 같이 PSA가 적용된 기술들을 다수 사용하게 되기 때문인 것 같다.
+
+Ioc/DI, AOP, PSA를 스프링이 제공하는 핵심 3대 요소라는 의미로 Spring Triangle이라고 묶어서 부른다고도 한다. 그만큼 이번주 과제를 통해 개념들을 공부하며 새삼 스프링이 개발자들에게 편의성을 제공한다는 사실을 실감할 수 있었다.
