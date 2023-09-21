@@ -2,6 +2,7 @@
 > Spring tutorial
 
 ![인텔리제이](https://github.com/CEOS-Developers/spring-tutorial-18th/assets/121355994/6e1c9bd9-ecca-4d96-aafc-4d50539f5c4e)
+
 ## ⭐ Spring의 POJO란 무엇인가?
 POJO는 Plain Old Java Object 의 약자로 getter, setter처럼 기본적인 기능만 가진 자바 객체를 의미한다.
 스프링은 POJO 방식을 기반으로 동작하는데, 이렇게 하면 좋은 점은 비지니스 로직과 사용되는 기술을 분리해서 사용할 수 있다는 점이다. <b>즉, 비지니스 로직을 담은 코드에서 기술적인 복잡함과 변경사항을 제거할 수 있는 것이다.</b>
