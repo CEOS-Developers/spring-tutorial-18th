@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 import java.util.Arrays;
 
@@ -16,6 +17,7 @@ public class Application {
 	}
 
 	@Bean
+	@Profile("temp")
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
 
