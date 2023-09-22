@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 @SpringBootApplication
 public class Application {
-q
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
