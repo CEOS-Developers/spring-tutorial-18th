@@ -1,3 +1,7 @@
+package com.ceos18.springboot;
+
+import com.ceos18.springboot.Test;
+import com.ceos18.springboot.TestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
