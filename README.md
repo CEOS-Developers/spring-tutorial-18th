@@ -405,3 +405,47 @@ public class AppConfig {
     4. ClassLoader가 로딩한 클래스들을 BeanDefinition으로 정의한다
        생성할 빈의 대한 정의
     5. 생성할 빈에 대한 정의를 토대로 빈 생성
+
+
+## 단위 테스트와 통합 테스트 탐구
+
+### 단위 테스트와 통합 테스트의 의미를 알아봅시다!
+#### 소프트웨어 테스트
+![test1](./img/test1.png)  
+[이미지출처] https://martinfowler.com/bliki/TestPyramid.html
+* 소프트웨어의 결함을 찾는 과정
+* 피라미드는 테스트 코드를 레벨 별로 작성해야한다는 의미
+* 테스트 코드의 양은
+  단위테스트(Unit) > service > UI(end to end) 순으로 작성
+* 단위테스트는 실행 속도가 빠르고, 많은 양의 코드를 작성해서 code coverage를 넓혀두어야 한다
+  > code coverage란 : 테스트가 충분한지 나타내는 지표 중 하나
+
+#### 단위 테스트
+* 소프트웨어에서 테스트할 수 있는 가장 작은 단위로,  
+  서비스, 도메인, 레포지토리 등의 단위 테스트 코드를 작성할 수 있다.
+* WebApplication 관련된 Bean들만 등록하기 때문에 통합 테스트보다 빠르고
+  통합 테스트를 진행하기 어려운 테스트를 진행할 수 있다
+* 요청부터 응답까지 모든 테스트를 Mock 기반으로 테스트하기 때문에 실제 환경에서는 제대로 동작하지 않을 수 있다
+#### 통합 테스트
+* 단위 테스트가 완료된 모듈들을 결합해 하나의 시스템으로 완성시키는 과정의 테스트로,
+  모듈 간 상호 작용 오류를 검사한다
+* 실제 운영 환경에서 사용될 클래스들을 통합하여 테스트하고  
+  스프링 프레임워크에서 전체적으로 플로우가 제대로 동작하는지 검증하기 위해 사용한다  
+  여러 모듈들을 모아 이들이 의도대로 협력하는지 확인하는 테스트이다
+### 스터디 자료의 단위 테스트 예제는 엄밀한 의미의 단위 테스트라고 부를 수 있을까요? 아니라면 엄밀한 의미의 단위 테스트로 구현하기 위해 어떻게 바꾸어야 할지 생각해 보아요. 😁
+```java
+@Service
+@RequiredArgsConstructor
+public class TestService {
+
+    private final TestRepository testRepository;
+
+    /* Read All*/
+    @Transactional(readOnly = true)
+    public List<Test> fetchAllTests() {
+        return testRepository.findAll();
+    }
+}
+```
+* 엄밀한 의미의 단위 테스트라고 할 수 없을 것 같다
+* 서비스, 도메인, 레포지토리 등의 단위나, 클래스나 메소드 수준의 더 작은 단위로 테스트 할 수 있을 것 같아
