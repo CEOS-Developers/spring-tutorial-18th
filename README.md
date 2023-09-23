@@ -13,10 +13,12 @@
 <div align="center">
 
 ### 📒 목차
-[0주차 | 스프링의 이해](#0주차-미션-주제:-Spring이-지원하는-기술들을-조사한다-👩🏻‍💻) <br>
+[0주차 | 스프링의 이해](#0주차-미션-주제) <br>
 [1주차 | 스프링 튜토리얼](#1주차-미션-주제) <br><br>
 
-### 0주차 미션 주제: Spring이 지원하는 기술들을 조사한다 👩🏻‍💻
+### 0주차 미션 주제
+### Spring이 지원하는 기술들을 조사한다 👩🏻‍💻
+<br><br>
 
 </div>
 
@@ -229,12 +231,12 @@ public class LogAop {
 2️⃣ H2 데이터베이스를 연결한다 📀<br><br>
 3️⃣ 스프링 어노테이션을 심층 분석한다 📓<br><br>
 4️⃣ 단위 테스트와 통합 테스트를 탐구한다 🧪
-</h4>
+</h4><br><br>
 
 <div align="center">
 
 ## 🌼 spring-boot-tutorial-18th 완료 사항
-• 스터디 자료에서 
+• 스터디 자료에서 약간 변경한 부분들
 </div>
 
 ```java
@@ -248,10 +250,17 @@ public class Plant {
 @Column(nullable = false)
 private String name;
 }
+
+public interface PlantRepository extends JpaRepository<Plant, Long> {}
+public class GardenService {}
+public class GardenController {}
 ```
 <div align="center">
+• H2에 튜플 넣고 api 요청 보내 확인하기 <br>
 <img width="500" alt="스크린샷 2023-09-19 오후 9 04 24" src="https://github.com/jongmee/spring-tutorial-18th/assets/101439796/3d339bfc-4185-4b78-badd-5a5c27b3f227">
 <img width="500" alt="스크린샷 2023-09-19 오후 10 48 06" src="https://github.com/jongmee/spring-tutorial-18th/assets/101439796/a6d18f43-e59b-4874-be79-17ac7edaac3f">
+
+<br><br>
 
 ## 🌼 Spring Annotation
 ✦ <b>Annotation</b> 이란?<br>
@@ -347,7 +356,7 @@ public class AppConfig {
 • 스프링 컨테이너 내에서 빈 저장소가 존재하고 key로 빈 이름(기본적으로는 메서드 이름)을, value로 실제 빈 객체를 가지고 있다.<br>
 • 스프링 컨테이너는 기본적으로 빈을 싱글톤으로 관리한다. 즉, 직접 싱글톤 패턴 구현을 위한 코드를 쓰지 않아도 된다.<br>
 • 싱글톤을 사용하면 요청마다 인스턴스를 생성하지 않고, <b>하나의 인스턴스만</b> 생성하고 공유해서 비용을 줄일 수 있다.<br>
-
+<br>
 ✦ <b>Singleton</b> 패턴에 필요한 요소<br>
 • new를 실행할 수 없도록 생성자에 접근 제어자 private을 지정한다.<br>
 • 유일한 단일 객체를 참조할 정적 참조 변수와 이 객체를 반환할 정적 메서드가 필요하다.<br>
@@ -370,6 +379,7 @@ public  class Singleton {
 ```
 
 <div align="center">
+<br>
 ✦ <b>Component Scan</b><br>
 • 설정 정보가 없어도 자동으로 스프링을 등록하는 기능으로 @Component 가 붙은 클래스를 스캔해서 등록한다. (@ComponentScan)<br>
 • 빈 이름은 맨 앞글자를 소문자로 바꾼 클래스명이다. <br>
@@ -410,10 +420,13 @@ public class MemberService{
 ```
 
 <div align="center">
+<br>
 ✦ Reference<br>
 1) [도서] 자바의 정석<br>
 2) [스프링 Document] https://docs.spring.io/spring-framework/reference/core/ <br>
 3) [도서] 스프링을 위한 자바 객체 지향의 원리와 이해
+
+<br><br>
 
 ## 🌼 Integration • Unit Test
 ✦ <b>단위 테스트</b>란?<br>
