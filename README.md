@@ -349,3 +349,579 @@ com.app.apiconfig.ExecutionTimer : 실행 메서드: dbAccess, 실행시간 = 10
 - [java-service-locator-pattern](https://www.baeldung.com/java-service-locator-pattern)
 - [AOP를 이용해 로그 데이터 남기기](https://velog.io/@solar/AOP-%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%B4-%EB%A1%9C%EA%B7%B8-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EB%82%A8%EA%B8%B0%EA%B8%B0)
 - [AOP(Aspect Oriented Programming) - DAO 실행 시간 측정 예제](https://victorydntmd.tistory.com/178)
+
+---
+
+# 1주차 - 스프링 튜토리얼
+
+`Annotation`을 사용하는 이유는 명명패턴의 단점을 해결하기 위함이다.<br/>
+
+## 명명패턴 단점
+
+```java
+// JUnit3 버전까지는 명명패턴 적용
+public class TestWorld extends TestCase {
+		// 메서드명의 접두사를 test로 시작하게끔
+		public void testSafetyOverride() {
+				...
+		}
+}
+```
+
+1. 오타가 나면 안됨
+   - `tsetSafetyOverride` 로 오타를 내도 JUnit3은 메서드를 무시하고 지나가서 통과한 것처럼
+2. 올바른 프로그램 요소에서만 사용된다고 보장 X
+   - `TestSafetyMechanisms` 이라고 지어도 JUnit3은 이름에 관심 없음
+   - 개발자가 의도한 테스트가 수행되지 않을 수 있음
+3. 프로그램 요소를 매개변수로 전달할 마땅한 방법이 없다
+   - 특정 예외를 던져야 성공하는 테스트가 있어도, 기대하는 예외 타입을 테스트에 매개변수로 전달해야 함
+
+## Annotation
+
+사전적인 정의로는 `주석` 이란 의미로, Java에서 `Anotation`은 코드 사이에 주석처럼 사용되며 특별한 의미, 기능을 수행하도록 하는 기술이다.<br/>
+프로그램에 추가적인 정보를 제공하는 `meta data`라고 할 수 있다<br/>
+사용하는 순서는 다음과 같다.
+
+1. Anotation 을 정의한다.
+2. 클래스에 Anotation을 배치한다.
+3. 코드가 실행되는 중에 `Reflaction`을 이용하여 추가 정보를 획득하여 기능을 실시한다.
+
+### Anotation 동작
+
+이 부분에서는 `Anotation`의 동작 방식을 보여주고자 직접 제작한 작은 테스트 프레임워크(`@Test`)를 통해 보여주도록 하겠다.<br/>
+
+- `Anotation`은 런타임과 컴파일 시에 해석이 된다는 특징
+- `Anotation`으로 할 수 있는 일은 명명패턴으로는 처리할 수 없음
+- 자바 프로그래머라면, ㅖ외 없이 자바가 제공하는 애너테이션 타입들을 사용
+
+### 메타 애노테이션
+
+```java
+// 테스트 메서드임을 선언하는 애너테이션
+// 현재는 매개변수가 없는 정적 메서드 전용
+@Rentation(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Test{
+
+}
+```
+
+- `@Target`
+  - 자바 컴파일러가 애노테이션 어디에 적용될지 결정하기 위해 사용
+    - `CONSTRUCTOR` : 생성자 선언 시
+    - `METHOD` : 메소드 선언 시
+    - `TYPE` : 클래스, 인터페이스, Enum 선언 시
+    - …
+- `@Rentation`
+  - 애노테이션이 실제 적용되고 유지되는 범위를 나타냄
+  - `@Rentation(RetentionPolicy.요소)` 형식으로 사용
+    - `SOURCE` : 컴파일 이후에도 JVM에 의해서 계속 참조
+    - `CLASS` : 컴파일러가 클래스를 참조할 때까지
+    - `RUNTIME` : 컴파일 전까지만 유효, 컴파일 후에는 사라짐
+- `Documented`
+  - 애노테이션이 지정된 대상의 JavaDoc에 애노테이션의 존재를 표기하도록 지정
+- `Inherited`
+  - 애노테이션을 사용한 상위 클래스를 상속한 하위 클래스에서도 해당 애노테이션을 갖도록 사용
+
+### 마커 애너테이션
+
+- “아무 매개변수 없이 단순히 대상에 마킹(marking) 한다”의 의미
+- 애너테이션 사용시, 오타를 내거나 메서드 선언 외의 프로그램 요소에 달면 `컴파일 오류`
+
+```java
+public class Sample {
+		@Test public static void m1()   // 성공
+		@Test public static void m2() { // 실패
+			throw new RuntimeException("실패");
+		}
+		@Test public void m3() {}       // 잘못 사용 예시
+}
+```
+
+```java
+// 마커 애너테이션 처리 프로그램
+public class RunTests {
+		public static void main(String[] args) throws Exception {
+            int tests = 0;
+            int passed = 0;
+            // 아직 알려지지 않은 타입(비한정적 타입)
+            // 매개변수 타입에 의존하지 않는 제네릭 클래스의 메서드 경우 사용
+            Class<?> testClass = Class.forName(args[0]);
+            for (Method m : testClass.getDeclaredMethods()) {
+                // isAnnotationPresent 가 실행할 메서드를 찾아주는 메서드
+                if (m.isAnnotationPresent(Test.class)) {
+                        tests++;
+                        try {
+                m.invoke(null);
+                passed++;
+                                        // 테스트 메서드가 예외를 던지면 리플랙션 메커니즘이 감싸서 잡아줌
+            } catch (InvocationTargetException wrappedExc) {
+                Throwable exc = wrappedExc.getCause(); // 정보 추출
+                System.out.println(m + " 실패: " + exc);
+            } catch (Exception exc) {
+                System.out.println("잘못 사용한 @Test: " + m);
+            }
+                }
+            }
+		}
+}
+```
+
+## 매개변수를 받는 애너테이션
+
+```java
+// 매개변수 하나를 받는 애너테이션 타입
+@Rentation(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Test{
+		/**
+     * Indicates the <em>containing annotation type</em> for the
+     * repeatable annotation type.
+     * @return the containing annotation type
+     */
+		Class<? extends Throwable> value(); // value : 매개변수의 타입
+}
+```
+
+- 특정 예외를 던져야만 성공하는 테스트를 만들기 위해서 `ExceptionTest` 애노테이션을 사용
+- 타입이 `Class<? extends Throwable>` 인 매개변수
+  - `Throwable` 의 확장한 하위 타입
+
+```java
+public class Sample2 {
+		// ArithmeticException : 0으로 나누려고 시도할 때
+    @ExceptionTest(ArithmeticException.class)
+    public static void m1() { // 성공
+        int i = 0;
+        i = i / i;
+    }
+
+    @ExceptionTest(ArithmeticException.class)
+    public static void m2() { // 실패 (다른 에러)
+        int[] ints = new int[0];
+        int i = ints[0];
+    }
+
+    @ExceptionTest(ArithmeticException.class)
+    public static void m3() {} // 실패 (예외 발생 X)
+}
+```
+
+```java
+// 1개 매개변수를 받는 애너테이션 사용
+// 매개변수를 받지 않은 메서드에서 catch 절만 수정
+try {
+    m.invoke(null);
+    System.out.printf("테스트 %s 실패: 예외를 던지지 않음%n", m);
+} catch (InvocationTargetException wrappedExc) {
+    Throwable exc = wrappedExc.getCause();
+    Class<? extends Throwable> excType // 이 부분에서 에러를 보고 기대한 에외가 맞는지
+										= m.getAnnotation(ExceptionTest.class).value();
+    if (excType.isInstance(exc)) {
+        passed++;
+    } else {
+        System.out.printf("테스트 %s 실패: 기대한 예외 %s, 발생한 예외 %s%n", m, excType.getName(), exc);
+    }
+} catch (Exception exc) {
+    System.out.println("잘못 사용한 @ExceptionTest: " + m);
+}
+```
+
+- 에러 코드를 테스트하는 것이기 때문에, 필요한 로직이 `catch` 절로 내려옴
+- `m.getAnnotation(Exception.class).value()`
+  - `Exception.class` 가 붙은 메서드의 매개변수값을 반환
+  - 현재 매개변수 값으로 `ArithmeticException` 1개 들어 있음
+- 예외의 클래스 파일이 컴파일타임에는 존재했으나, 런타임에는 존재하지 않을 수 있음
+  - `TypeNotPresentException` 발생
+
+## 매개변수 2개 이상의 애너테이션
+
+### 1. 배열 매개변수 애너테이션
+
+```java
+// 매개변수 여러 개를 받는 애너테이션 타입
+@Rentation(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Test{
+		Class<? extends Throwable>[] value();
+}
+```
+
+```java
+// 원소들을 중괄호로 묶고, 쉼표로 구분
+@ExceptionTests({IndexOutOfBoundsException.class, NullPointerException.class})
+public static void doublyBad() {
+
+}
+```
+
+```java
+// 여러 개 매개변수를 받는 애너테이션 사용
+// 매개변수를 받지 않은 메서드에서 catch 절만 수정
+try {
+    m.invoke(null);
+    System.out.printf("테스트 %s 실패: 예외를 던지지 않음%n", m);
+} catch (InvocationTargetException wrappedExc) {
+    Throwable exc = wrappedExc.getCause();
+    int oldPassed = passed;
+    Class<? extends Throwable>[] excTypes  // 이 부분에서 배열로 매개변수 받기
+							= m.getAnnotation(ExceptionTests.class).value();
+    for (Class<? extends Throwable> excType : excTypes) {
+        if (excType.isInstance(exc)) {
+            passed++; // 존재하지 않으면 pass 늘리지 않아서 밑에 if 문 걸리게 됨
+            break;
+        }
+    }
+    if (passed == oldPassed) {
+        System.out.printf("테스트 %s 실패: %s %n", m, exc);
+    }
+} catch (Exception exc) {
+    System.out.println("잘못 사용한 @ExceptionTest: " + m);
+}
+```
+
+- 반복문을 순회하면서, 예외가 일치하는지 확인
+
+### 2. `@Repeatable` 메타 에너테이션을 활용
+
+- 하나의 프로그램 요소에 여러 번 달 수 있게 해줌
+- 주의 사항
+  - `@Repeatable` 을 반환하는 “컨테이너 애너테이션”을 하나 더 정의하고 class 객체를 매개변수로 전달
+  - “컨테이너 애너테이션”은 내부 애너테이션 타입의 배열을 반환하는 `value` 매서드 정의
+  - 적절한 `@Retention`, `@Target` 을 설정
+- 사용 이유
+  - 별도의 컨테이너 애노테이션을 정의해야 해서 복잡해보이지만, 여러 값을 받아야하는 속성에 따라 하나하나 명시하는 것이 가독성 면에서 좋음
+
+```java
+// 실제 사용할 애노테이션
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Repeatable(ExceptionTestContainer.class) // 묶고자 하는 애너테이션 자체에 선언
+public @interface ExceptionTest {
+    Class<? extends Throwable> value(); // value 에 들어갈 애노테이션 타입을 중복해서 사용
+}
+
+// 애너테이션 묶음 값을 관리할 컨테이너 애노테이션 작성
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ExceptionTestContainer {
+    ExceptionTest[] value();
+}
+```
+
+```java
+// 중복으로 애노테이션을 달 수 있음
+@ExceptionTest(IndexOutOfBoundsException.class)
+@ExceptionTest(NullPointerException.class)
+public static void doublyBad() {
+}
+```
+
+- 주의점
+  - 반복 가능 애너테이션을 여러 개 달면, 하나만 달았을 때와 구분하기 위해 컨테이너 애너테이션 타입 적용
+  - `getAnnotationByType`
+    - 반복 가능 애너테이션, 컨테이너 애너테이션 모두 가져옴
+  - `isAnnotationPresent`
+    - 반복 가능 애너테이션이 달렸는지 검사하면 의도와 다른 결과 값을 반환
+    - 반복 가능 애너테이션과 컨테이너 애너테이션 모두 확이내야 함
+
+```java
+//before
+if (m.isAnnotationPresent(ExceptionTest.class)) {
+		//...
+}
+
+//after
+if (m.isAnnotationPresent(ExceptionTest.class)
+|| m.isAnnotationPresent(ExceptionTestContainer.class)){
+		//....
+}
+```
+
+---
+
+## 스프링에서 Anotation
+
+## 1. 스프링 컨테이너 생성 과정
+
+```java
+ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+```
+
+`ApplicationContext`를 스프링 컨테이너라고 부릅니다. <br>
+`AnnotationConfigApplicationContext`는 ApplicationContext 인터페이스의 구현체입니다. <br> <br>
+
+1. 위와 같이 AppConfig class를 파라미터로 넘기면 스프링 컨테이너에 key를 빈의 이름으로, value를 빈 객체로 갖는 **스프링 빈 저장소**가 생성됩니다. 이 구성 정보를 활용합니다.
+2. **스프링 빈 등록**
+   이후, AppConfig를 참고하여, `@Bean`이 달린 모든 메서드를 호출하며, 위에서 설명한 스프링 빈 저장소를 채웁니다. -> 스프링 빈을 채웁니다. 예를 들어, 아래와 같이 AppConfig가 구성 되어 있다면?
+
+```java
+  @Bean
+  public MemberService memberService() {
+    return new MemberServiceImpl(getMemberRepository());
+  }
+
+  @Bean
+  public OrderService orderService() {
+    return new OrderServiceImpl(getMemberRepository(),discountPolicy());
+  }
+
+  @Bean
+  public MemoryMemberRepository getMemberRepository() {
+    return new MemoryMemberRepository();
+  }
+
+  @Bean
+    public DiscountPolicy discountPolicy() {
+    return new RateDiscountPolicy();
+  }
+```
+
+아래와 같이 스프링 빈 저장소가 채워집니다.
+|빈 이름|빈 객체|
+|:----:|:----:|
+|memberService|memberService@x01|
+|orderService|orderService@x02|
+|memberRepository|memberRepository@x03|
+|discountPolicy|discountPolicy@x04|
+
+**주의:** 빈 이름은 **절대 중복 금지!**, 그리고 단순, 명확하게..
+
+3. **스프링 빈 의존관계 설정! - 준비**
+4. 스프링 빈 의존관계 설정 - 완료
+
+- 스프링 컨테이너는 이 설정 정보들을 참고해서 (AppConfig 파일) 의존관계를 주입합니다! **DI!**
+- 단순히 자바 코드를 호출하는 것을 넘는 의미가 있다 -> 뒷 차시 싱글톤 컨테이너에서 설명
+
+<br> 결론:
+**스프링 컨테이너 생성 과정: 스프링 빈 저장소 생성 -> 스프링 빈 등록 -> 스프링 빈 의존관계 설정 준비 -> 완료**
+
+# 2. 컨테이너 등록된 빈 조회
+
+```java
+  AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+
+  @Test
+  @DisplayName("모든 빈 출력하기")
+  void findAllBean() {
+    String[] beanDefinitionNames = agetBeanDefinitionNames();
+    for (String beanDefinitionName : beanDefinitionNames) {
+      Object bean = ac.getBean(beanDefinitionName);
+      System.out.println("name = " + beanDefinitionName + ", object = " + bean);
+    }
+  }
+
+  @Test
+  @DisplayName("애플리케이션 빈만 출력하기")
+  void findApplicationBean() {
+    String[] beanDefinitionNames = agetBeanDefinitionNames();
+    for (String beanDefinitionName : beanDefinitionNames) {
+      BeanDefinition beanDefinition = ac.getBeanDefinition(beanDefinitionName);
+
+      // Role ROLE_APPLICATION: 직접 등록한 애플리케이션 빈
+      // Role ROLE_INFRASTRUCTURE: 스프링이 내부에서 사용하는 빈
+      if (beanDefinition.getRole() == BeanDefinition.ROLE_INFRASTRUCTURE) {
+        Object bean = ac.getBean(beanDefinitionName);
+        System.out.println("name = " + beanDefinitionName + ", object = " + bean);
+      }
+    }
+  }
+```
+
+- `getBeanDefinitionNames()`: 스프링에 등록된 모든 빈 이름 조회
+- `getBean()`: 빈 이름으로 빈 객체를 조회한다.
+  [ 애플리케이션 빈 출력용 Role 구분 ]
+- `getRole()`로 빈들의 Role을 가져올 수 있다.
+- BeanDefinition.ROLE_APPLICATION: 직접 등록한 애플리케이션 빈
+- BeanDefinition.ROLE_INFRASTRUCTURE: 스프링이 내부에서 사용하는 빈
+
+# 3. 스프링 빈 조회
+
+평범하게 조회할 때는 `getBean()`이면 된다. 조회 대상 빈이 없으면 `NoSuchBeanDefinitionException` 예외가 발생한다.
+
+- `ac.getBean(빈 이름, 타입)`
+- `ac.getBean(타입)`
+  구체 타입으로 조회할 수도 있다.
+
+```java
+  AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+
+  @Test
+  @DisplayName("빈 이름으로 조회")
+  void findBeanByName() {
+    MemberService memberService = ac.getBean("memberService", MemberService.class);
+    assertThat(memberService).isInstanceOf(MemberServiceImpl.class);
+  }
+
+  @Test
+  @DisplayName("이름 없이 타입으로만 조회")
+  void findBeanByType() {
+    MemberService memberService = ac.getBean(MemberService.class);
+    assertThat(memberService).isInstanceOf(MemberServiceImpl.class);
+  }
+```
+
+## 3.1 동일한 타입이 둘 이상일 때의 조회
+
+동일한 타입이 둘 이상이면, 타입으로 빈을 가져올 때 오류가 발생한다. 그런 경우는 충분히 있을 수 있고, 그럴 때는 정확한 빈 이름을 지정하면 된다. `getBeansOfType()`을 사용하면 해당 타입의 모든 빈을 조회할 수 있다.
+
+```java
+  @Test
+  @DisplayName("특정 타입을 모두 조회하기")
+  void findBeanByType() {
+    Map<String, MemberRepository> beansOfType = ac.getBeansOfType(MemberRepository.class);
+    for (Stirng key : beansOfType.keySet()) {
+      System.out.println("key = " + key + ", value = " + beansOfType.get(key));
+    }
+    System.out.println("beansOfType = " + beansOfType);
+  }
+```
+
+## 3.2 상속관계 스프링 빈 조회 (중요)
+
+스프링 빈을 조회할 떄, **부모 타입을 조회한다면 자식 타입이 전부 끌려 나온다.** depth가 어떻든 고구마 뿌리 뽑듯 전부 끌려 나온다. <br> 모든 스프링 빈을 조회하고 싶으면 어떻게 할까? **모든 자바 객체의 최고 부모인 `Object` 타입으로 조회를 해버리면, 모든 스프링 빈을 조회한다.** -> 부모 타입으로 조회할 때 자식 타입이 어디까지 조회되나는 좀 알고 있어야한다.
+
+```java
+  @Test
+  @DisplayName("부모 타입으로 모두 조회하기")
+  void findAllBeansByParentType() {
+    Map<String, DiscountPolicy> beansOfType = ac.getBeansOfType(DiscountPolicy.class);
+    Assertions.assertThat(beansOfType.size()).isEqualTo(2);
+    for (String key : beansOfType.keySet()) {
+      System.out.println("key = " + key + ", value = " + beansOfType.get(key));
+    }
+  }
+
+  @Test
+  @DisplayName("부모 타입으로 모두 조회하기 - Object")
+  void findAllBeanByObjectType() {
+    Map<String, Object> beansOfType = ac.getBeansOfType(Object.class);
+    for (String key : beansOfType.keySet()) {
+        System.out.println("key = " + key + ", value = " + beansOfType.get(key));
+    }
+  }
+```
+
+---
+
+## @ComponentScan
+
+스프링에서는 프로그램을 만들면서 필요에 따라 `Bean`을 등록한다. 빈을 등록하는 과정에서, 설정한 빈들을 찾기 위해 등록될 객체들을 탐색해야 한다. 탐색하는 것을 컴포넌트 스캔이라 부르며, 컴포넌트 스캔은 `@ComponentScan`을 설정 정보에 붙여주면 사용 가능하다.
+
+```java
+@Configuration
+@ComponentScan(
+        excludeFilters = @ComponentScan.Filter(type =  FilterType.ANNOTATION, classes = Configuration.class)
+)
+public class AutoAppConfig {
+
+}
+```
+
+기본적으로 **`@Component` 애노테이션이 붙은 클래스를 스캔해서 스프링 빈으로 등록합니다.** 스프링 빈에 등록하고 싶은 클래스들에 `@Component`를 달아주면 됩니다. `@Configuration`이 붙은 설정 정보도 자동으로 등록이 되는데, 이는 `@Configuration`의 소스 코드를 열어보면 `@Component`가 붙어있기 때문!
+
+### 1. 탐색할 패키지 등록
+
+컴포넌트 스캔은 탐색할 패키지의 시작 위치를 지정할 수 있습니다. <br>
+`basePackages`에 원하는 패키지를 정리하면, 해당 패키지만을 탐색하여 `Bean`으로 등록하게 되고, 특정 클래스만을 지정해주고 싶은 경우 `basePackageClasses`에 클래스의 이름을 지정하면 됩니다.<br>
+예시는 다음과 같습니다.<br>
+
+- `member`, `service` 패키지만을 탐색하고 싶은 경우
+- `Controller`, `Model` 클래스를 탐색하고 싶은 경우
+
+```java
+@Configuration
+@ComponentScan(
+  basePackages = { "hello.core.member", "hello.service" },
+  basePackageClasses = {Controller.class, Model.class}
+  excludeFilters = @ComponentScan.Filter(type =  FilterType.ANNOTATION, classes = Configuration.class)
+)
+public class AutoAppConfig {
+}
+```
+
+패키지가 너무 많거나, 특정 패키지만 스캔하고 싶을 때 위와 같이 원하는 부분만을 지정하여 스캠하도록 작성합니다.
+
+## 2. Default
+
+```java
+package ceos18.core;
+import ...
+@Configuration
+@ComponentScan(
+  excludeFilters = @ComponentScan.Filter(type =  FilterType.ANNOTATION, classes = Configuration.class)
+)
+public class AutoAppConfig {
+}
+```
+
+`@ComponentScan`이 붙어있는 클래스인 AutoAppConfig가 속해있는 패키지인 ceos18.core 부터 ~ 하위 모든 패키지를 검사하는 것이 기본 설정<br>
+Spring Boot나 강사님이 권장하는 방법은 **패키지 위치를 따로 지정하지 않고, 설정 정보 클래스의 위치를 프로젝트 최상단에 두는 것을 권장합니다!**
+<br>
+
+예를 들어 `com.ceos18`인 곳에 컴포넌트 스캔이 있으면 자동적으로 `com.ceos18.member`, `com.ceos18.service` 등을 체크해서 등록시켜준다.
+
+### `@SpringBootApplication`
+
+**컴포넌트 스캔은 달 필요가 없다?** <br>
+`@SpringBootApplication`은 가장 처음 프로젝트를 만들면, 최상위 클래스에 만들어지는 스프링 부트 어플리케이션의 시작점 클래스를 나타내는 곳으로 `@ComponentScan` Anotation이 소스코드에 붙어 있는 것을 확인할 수 있다.<br>
+<img width="1008" alt="스크린샷 2023-09-23 오후 3 03 55" src="https://github.com/GDSC-Hongik/Effective-Java/assets/89639470/6a089127-5d82-4266-99cf-3d6d75c153be">
+
+### 기본 스캔 컴포넌트
+
+아래 애노테이션들은 전부 `@Component`를 가지고 있습니다. **애노테이션 끼리 상속관계를 갖는다기 보다는, 스프링에서 애노테이션이 애노테이션을 들고 있도록 합니다.**
+
+- `@Controller`: 스프링 MVC Controller로 인식
+- `@Service`: 특별한 처리 X, 개발자들이 보기 위한 것
+- `@Repository`: 스프링 데이터 접근 계층으로 인식, 데이터 계층 예외를 스프링 예외로 변환
+- `@Configuration`: 스프링 설정 정보로 인식하고, 스프링 빈이 싱글톤을 유지하도록 추가 처리
+
+### 컴포넌트 스캔 필터
+
+필터를 통해 사용자가 직접 만든 `Anotation`도 추가해줄 수 있다.
+
+```java
+@ComponentScan(
+  includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = MyIncludeComponent.class),
+  excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = MyExcludeComponent.class)
+)
+```
+
+---
+
+## 테스트 기법
+
+### 단위 테스트(Unit Test)
+
+하나의 모듈을 기준으로 독립적으로 진행되는 가장 작은 단위의 테스트를 말한다. 여기서 모듈은 애플리케이션에서 작동하는 하나의 기능 또는 메서드를 말하며, 하나의 기능이 올바르게 동작하는지를 독립적으로 테스트하는 것이다.<br>
+즉 "어떤 기능이 실행되면 어떤 결과가 나온다"정도의 테스트를 진행한다.<br>
+단위 테스트 필요성은 아래와 같다.<br>
+
+- 테스팅에 대한 시간과 비용을 절감할 수 있다.
+- 새로운 기능 추가 시에 수시로 바르게 테스트 할 수 있다.
+- 리팩토링 시에 안정성을 확보할 수 있다.
+- 코드에 대한 문서가 될 수 있다.
+
+좋은 단위 테스트의 특징은 다음과 같다.<br>
+
+- 1개의 테스트 함수에 대해 assert를 최소화하라.
+- 1개의 테스트 함수는 1가지 개념만을 테스트 하라
+
+### 통합 테스트(Integration Test)
+
+모듈을 통합하는 과정에서 모듈 간의 호환성을 확인하기 위해 수행되는 테스트를 말한다.<br>
+애플리케이션은 보통 여러 개의 모듈들로 구성이 되고, 모듈들끼리 메세지를 주고 받으면서(함수 호출) 기능을 수행한다. 올바르게 연계되어 동작하는지 검증이 필요한데, 통합 테스트는 독립적인 기능에 대한 테스트가 아니라 웹 페이지로부터 API를 호출하여 올바르게 동작하는 지를 확인하는 테스트 방법이다.
+
+### 스터디 자료의 단위 테스트 예제
+
+어떤 것인지 잘 모르겠어서 일단 제출하겠습니다..
+
+### 총정리
+
+이번 1주차 미션을 통해 어노테이션과 테스트 방법들에 대해 깊이 공부할 수 있는 시간이었습니다. 단위 테스트 부분 또한 "클린 코드" 책을 참고하여 정리하고 싶었지만, 시간 상의 문제로 간단하게밖에 정리하지 못했던 점이 아쉽습니다.
+
+### 참고자료
+
+[이펙티브 자바 - Item 39. 명명 패턴보다 애너테이션을 사용하라](https://www.yes24.com/Product/Goods/65551284)<br>
+[@ComponentScan이란 무엇인가?](https://mungto.tistory.com/448)<br>
+[단위 테스트 vs 통합 테스트 차이](https://mangkyu.tistory.com/143)<br>
