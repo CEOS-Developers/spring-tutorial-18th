@@ -388,3 +388,12 @@ findAll()은 어떤 데이터가 TestRepository에 저장되었을 때 그 데�
 그래서 save() 메소드 테스트를 먼저 진행하고, findAll() 메소드 테스트를 진행할 때 임의로 몇몇 데이터를 삽입하고 그 데이터들이 모두 반환되느냐를 체크하는 것이 정확할 것이다.
 또 해당 테스트의 return 값은 true 혹은 false로 나타나는 boolean을 사용해야한다.
 좋은 테스트의 법칙으로 F.I.R.S.T 법칙이라는 것이 있는데, 그중에 S는 self-validating, 즉 자가 검증하는 것을 의미하며 테스트의 결과가 Boolean 값으로 나와야 한다는 것을 의미한다. 하지만 해당 테스트는 return 값을 List 로 받고 있기에 수정해주는 것이 좋다.
+
+---
+### 참고자료 
+- https://yongku.tistory.com/entry/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8Unit-Test%EC%99%80-%ED%86%B5%ED%95%A9-%ED%85%8C%EC%8A%A4%ED%8A%B8Integration-Test-%EA%B8%B0%EB%8A%A5-%ED%85%8C%EC%8A%A4%ED%8A%B8Functional-Test%EB%9E%80
+- https://mangkyu.tistory.com/182
+- https://haruhiism.tistory.com/184
+- https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%ED%95%B5%EC%8B%AC-%EC%9B%90%EB%A6%AC-%EA%B8%B0%EB%B3%B8%ED%8E%B8
+
+
