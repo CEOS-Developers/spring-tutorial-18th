@@ -451,8 +451,8 @@ public  class  HelloControllerTest {
 
 ---
 #### ☄️Troubleshooting
-1️⃣ Intellij로 Spring 코드 첫 실행 시 finished with non-zero exit value 1 오류
-🔸 원인: Intellij 내 Build and run using과 Run tests using 설정 변경이 필요
+1️⃣ Intellij로 Spring 코드 첫 실행 시 finished with non-zero exit value 1 오류 <br>
+🔸 원인: Intellij 내 Build and run using과 Run tests using 설정 변경이 필요 <br>
 🔸 해결방법:
 1.  [File > Settings] 메뉴 클릭 (맥 기준 단축키 : Command + ,)
 2.  [Build, Excution, Deployment > Build Tools > Gradle] 클릭
