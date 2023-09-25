@@ -96,7 +96,7 @@ https://csy7792.tistory.com/315
        - 수동으로 직접 빈을 등록하는 작업은 빈으로 등록하는 클래스가 많아질수록 상당히 많은 시간을 차지할 것이고, 생산력 저하를 일으킬 수 있음
        - 컴포넌트 스캔(Component Scan)을 사용해 @Component 어노테이션이 있는 클래스들을 찾아서 자동으로 빈 등록
 
-  - Component Scan : Component Scan은 anotation인 @Component를 명시하여 Bean에 추가하는 방법. 클래스위에 anotationd을 추가해주면 자연스럽게 Bean에 객체로 추가가 됨
+  - Component Scan : Component Scan은 anotation인 @Component를 명시하여 Bean에 추가하는 방법. 클래스위에 anotation을 추가해주면 자연스럽게 Bean에 객체로 추가가 됨
 
   - 해당 anotation을 확인하면 바로 Spring의 Bean으로 포함되어 객체를 사용할 수 있게됨
 
