@@ -1,164 +1,109 @@
-# CEOS 18th Backend Study - 0주차 미션
-Spring이 지원하는 기술들(IoC/DI, AOP, PSA 등)을 자유롭게 조사합니다.
+# CEOS 18th Backend Study - 1주차 미션
+스프링 어노테이션을 심층 분석해요
+- 어노테이션이란 무엇이며, Java에서 어떻게 구현될까요?
+- 스프링에서 어노테이션을 통해 Bean을 등록할 때, 어떤 일련의 과정이 일어나는지 탐구해보세요.
+- `@ComponentScan` 과 같은 어노테이션을 사용하여 스프링이 컴포넌트를 어떻게 탐색하고 찾는지의 과정을 깊게 파헤쳐보세요.
 
-## IoC/DI
+단위 테스트와 통합 테스트 탐구
+- 단위 테스트와 통합 테스트의 의미를 알아봅시다!
+- 스터디 자료의 단위 테스트 예제는 엄밀한 의미의 단위 테스트라고 부를 수 있을까요?
+- 아니라면 엄밀한 의미의 단위 테스트로 구현하기 위해 어떻게 바꾸어야 할지 생각해 보아요.
 
-IoC은 Inversion of Control의 약자로, 제어의 역전을 의미한다. 프로그램의 제어 흐름을 직접 제어하는 것이 아니라 외부에서 관리하는 것이다.
+## 스프링 어노테이션 심층 분석
 
-기존의 프로그램은 클라이언트 입장의 구현 객체가 서버 입장의 구현 객체를 <b>직접 생성하여 연결 및 실행</b>하였다. 다음과 같은 OrderServiceImpl이 있다.
+### 어노테이션이란 무엇이며, Java에서 어떻게 구현될까요?
+어노테이션이란, 프로그램의 소스코드 안에 다른 프로그램을 위한 정보를 미리 약속된 형식으로 포함시킨 것이다. 
+어노테이션은 주석처럼 프로그래밍 언어에 영향을 미치지 않으면서도 다른 프로그램에게 유용한 정보를 제공할 수 있다.
+다음은 @Test 어노테이션을 활용한 코드의 일부이다.
 
-```
-public class OrderServiceImpl {
-
-  private final MemberRepository memberRepository = new MemoryMemberRepository();
-
-  private final DiscountPolicy discountPolicy = new FixDiscountPolicy();
-
+```java
+@Test
+public void method() {
+    ...
 }
 ```
 
-위 코드에서 OrderServiceImpl은 MemoryMemberRepository, FixDiscountPolicy를 사용하는 클라이언트 입장의 구현 객체이고, MemoryMemberRepository, FixDiscountPolicy은 서버 입장의 구현 객체이다. 이때, OrderServiceImpl은 직접 구현체를 생성하여 연결 및 실행하므로 프로그램의 제어 흐름을 직접 제어하고 있다. 
+이때, @Test 어노테이션은 하위 메서드를 테스트해야 한다는 것을 알리는 역할을 할 뿐, 메서드가 포함된 프로그램 자체에는 아무런 영향을 미치지 않는다.
 
-현재 할인 정책은 FixDiscountPolicy로, 고정 금액 할인이 이루어진다. 그런데 만약 주문 가격 대비 %로 할인을 할 수 있도록 정책을 변경하려면 어떻게 해야할까? 다음과 같이 클라이언트인 OrderServiceImpl의 코드를 고쳐야 한다.
+Java에서 어노테이션을 구현하는 방법은 아래와 같다. 
 
-```
-public class OrderServiceImpl {
-
-  private final MemberRepository memberRepository = new MemoryMemberRepository();
-
-///  private final DiscountPolicy discountPolicy = new FixDiscountPolicy();
-  private final DiscountPolicy discountPolicy = new RateDiscountPolicy();
-
+```java
+@interface 어노테이션이름 {
+    타입 요소이름(); // 어노테이션의 요소를 선언
+    ...
 }
 ```
 
-하지만 위와 같은 코드가 좋은 코드는 아니다. 좋은 객체 지향 설계의 5가지 원칙(SOLID) 중 OCP와 DIP를 위반하고 있기 때문이다.
+@ 기호를 붙이는 것을 제외하면 인터페이스를 정의하는 것과 동일하며, 어노테이션 내에 선언된 메서드를 어노테이션의 요소라고 한다. 어노테이션의 적용 시 모든 요소들의 값을 지정해주어야 하는데, 각 요소는 기본값을 가질 수 있어 값을 지정하지 않으면 기본값이 사용된다.
 
-- OCP(Open/Closed Principle) : 개방-폐쇄 원칙으로, 소프트웨어 요소가 확장에는 열려있으나 변경에는 닫혀있어야 함을 의미한다. 즉, 기존의 코드를 변경하지 않으면서(Closed), 기능을 추가할 수 있도록(Open) 설계가 되어야 한다는 원칙이다.
+어노테이션의 요소를 선언할 때 반드시 지켜야 하는 규칙은 다음과 같다.
+- 요소의 타입은 기본형, String, enum, 어노테이션, Class만 허용된다
+- () 안에 매개변수를 선언할 수 없다
+- 예외를 선언할 수 없다
+- 요소를 타입 매개변수로 정의할 수 없다
 
-- DIP(Dependency Inversion Principle) : 의존관계 역전 원칙으로, 구체화에 의존하지 않고 추상화에 의존해야 함을 의미한다. 즉, 클라이언트가 구현 클래스에 의존하지 않고, 인터페이스에 의존해야 한다는 원칙이다.
+다음은 잘못된 어노테이션 요소 선언의 예시이다.
 
-해결을 위해 OrderServiceImpl이 인터페이스에만 의존하도록 코드를 변경한다.
-
-```
-public class OrderServiceImpl {
-
-  private final MemberRepository memberRepository;
-  private final DiscountPolicy discountPolicy;
-
-  public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
-
-    this.memberRepository = memberRepository;
-    this.discountPolicy = discountPolicy;
-  }
+```java
+@interface AnnoTest {
+    String major(int i, int j); // () 안에 매개변수 선언할 수 없음
+    String minor() throws Exception; // 예외 선언할 수 없음
+    ArrayList<T> list(); // 요소의 타입에 타입 매개변수 사용불가
 }
 ```
-이 경우, OrderServiceImpl이 의존하고 있는 인터페이스의 구현 객체는 생성자를 통해 <b>외부에서 대신 생성하여 주입</b>해준다. 이것을 DI(Dependency Injection), 의존관계 주입 또는 의존성 주입이라고 한다.
 
-이렇게 되면 OrderServiceImpl은 오직 자신의 로직을 실행하는 역할만 담당한다. 프로그램의 제어 흐름은 인터페이스의 구현 객체를 생성하고 주입하는 쪽에서 가져가는 것이다. 이것을 IoC(Inversion of Control), 제어의 역전이라고 한다.
+### 스프링에서 어노테이션을 통해 Bean을 등록할 때, 어떤 일련의 과정이 일어나는지 탐구해보세요.
+#### @Bean 사용
 
-객체를 생생하고 관리하면서 의존관계를 연결해주는 겻을 IoC 컨테이너 또는 DI 컨테이너라고 한다. 스프링의 경우, @Bean이 붙은 메서드를 호출하여 반환된 객체를 <b>스프링 컨테이너</b>에 등록한다. 스프링 컨테이너에 등록된 객체를 <b>스프링 빈</b>이라고 한다.
+스프링 컨테이너는 @Configuration이 붙은 클래스를 설정 정보로 사용한다. 여기서 @Bean이 붙은 메서드를 모두 호출하고, 반환된 객체를 스프링 컨테이너에 등록한다.
+이때, 등록되는 스프링 빈은 따로 지정하지 않았다면 메서드의 이름을 스프링 빈의 이름으로 사용하여 key로 삼고, bean 객체를 value로 삼는다.
 
-### 참고 
+#### @ComponentScan 사용
+
+@ComponentScan을 사용하면 @Component 어노테이션이 붙은 모든 클래스를 스캔해서 스프링 빈으로 등록한다.
+이때, 등록되는 스프링 빈은 따로 지정하지 않았다면 클래스의 이름을 스프링 빈의 이름으로 사용하여 key로 삼고, bean 객체를 value로 삼는다.
+
+### `@ComponentScan` 과 같은 어노테이션을 사용하여 스프링이 컴포넌트를 어떻게 탐색하고 찾는지의 과정을 깊게 파헤쳐보세요.
+@ComponentScan 어노테이션 사용 시, basePackages 값 설정을 통해 탐색할 패키지의 시작 위치를 지정하거나 basePackageClasses 값 설정을 통해 지정한 클래스의 패키지를 탐색 시작 위치로 지정할 수 있다. 탐색할 패키지의 시작 위치를 지정하면 그 패키지를 포함한 하위 패키지를 모두 탐색한다.
+
+컴포넌트 스캔 기본 대상은 다음과 같다.
+- @Component
+- @Controller
+- @Service
+- @Repository
+- @Configuration
+
+필터를 통해 컴포넌트 스캔 대상을 추가하거나 제외할 수도 있다.
+- includeFilters : 컴포넌트 스캔 대상을 추가로 지정
+- excludeFilters : 컴포넌트 스캔에서 제외할 대상을 지정
+
+위와 같이 컴포넌트 스캔을 위한 여러 설정을 하고나면, ComponentScanAnnotationParser가 컴포넌트 후보를 모두 찾아 스캔하기 위하여 해당 설정을 파싱하여 가져온다.
+설정을 바탕으로 ClassLoader를 이용하여 모든 클래스를 로딩하고, 로딩한 클래스를 BeanDefinition으로 정의한다. 이후, 설정한 빈 정의를 바탕으로 빈을 생성한다.
+
+
+### 참고
+- 자바의 정석 3판
 - https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%ED%95%B5%EC%8B%AC-%EC%9B%90%EB%A6%AC-%EA%B8%B0%EB%B3%B8%ED%8E%B8
-- https://pangtrue.tistory.com/228
-- https://hckcksrl.medium.com/solid-%EC%9B%90%EC%B9%99-182f04d0d2b
+- https://jess-m.tistory.com/14
 
-## AOP
+## 단위 테스트와 통합 테스트 탐구
 
-AOP는 Aspect Oriented Programming의 약자로, 관점 지향 프로그래밍을 의미한다. 어떤 로직을 기준으로 핵심적인 관점, 부가적인 관점으로 나누어서 보고 그 관점을 기준으로 공통된 로직이나 기능을 하나의 단위로 묶는다.
+### 단위 테스트와 통합 테스트의 의미를 알아봅시다!
+#### 단위 테스트
+하나의 모듈을 기준으로 독립적으로 진행되는 가장 작은 단위의 테스트를 단위 테스트라고 한다. 이때, 모듈은 애플리케이션에서 작동하는 하나의 기능 또는 메서드로 볼 수 있다. (ex. 로그인 메서드에 대한 독립적인 테스트)
 
-프로그램에는 핵심적인 비즈니스 로직이 포함되는 <b>핵심 관심 사항(core concern)</b>이 있고, 프로그램 전체에 반복적으로 적용되는 공통적인 부가 기능 로직이 포함되는 <b>공통 관심 사항(cross-cutting concern)</b>이 있다.
+즉, 단위 테스트는 프로그램의 각 부분을 고립시켜 각각의 부분이 정확하게 동작하는지의 여부를 확인할 수 있다. 그렇기 때문에 에러 발생 시 어느 부분이 잘못되었는지를 빠르게 찾을 수 있다.
 
-공통 관심 사항의 코드를 핵심 관심 사항의 코드와 분리하여, 코드의 간결성을 높이고 유연한 변경과 무한한 확장이 가능하도록 하는 것이 AOP의 목적이다.
+#### 통합 테스트
+모듈을 통합하는 과정에서 모듈 간의 호환성을 확인하기 위해 수행되는 테스트를 통합 테스트라고 한다. 실제 프로그램 상에서 각각의 모듈은 개별적으로 존재하는 것이 아니라 서로 유기적 관계를 맺는다. 따라서 통합 테스트를 통해 모듈 간의 상호작용이 정상적으로 수행되는지의 여부를 확인한다.
 
-AOP를 적용하는 방식에는 어느 시점에 적용하느냐에 따라 컴파일 시점 적용, 클래스 로딩 시점 적용, 런타임 시점 적용이 있으며, 스프링은 런타임 시점 적용 방식을 사용한다.
+### 스터디 자료의 단위 테스트 예제는 엄밀한 의미의 단위 테스트라고 부를 수 있을까요? 아니라면 엄밀한 의미의 단위 테스트로 구현하기 위해 어떻게 바꾸어야 할지 생각해 보아요.
 
-런타임 시점 적용은 컴파일, 클래스 로딩, main() 메서드의 실행 이후에 자바가 제공하는 범위 내에서 부가 기능을 적용하는 방식이다. 이미 런타임 중이므로 코드를 조작하기 어려워 여러 개념과 기능을 활용하여 프록시를 통해 부가 기능을 적용한다.
+단위 테스트 예제에서의 TestService는 findAll()이라는 하나의 기능만을 테스트하고 있지만, TestRepository에 의존한다는 점에서 엄밀한 의미의 단위 테스트로 판단하기는 어렵다고 생각한다. 또한, findAll()로 testRepository에 저장된 모든 값을 가져올 뿐, 코드 상에서 그 값들이 올바르게 저장된 값들임을 확인하는 로직은 존재하지 않는다.
 
-프록시는 메서드 실행 시점에서만 다음 타겟을 호출할 수 있기 때문에, 런타임 시점에 부가기능을 적용하는 방식은 메서드의 실행 지점으로 제한된다.
-
-예를 들어, MemberController, MemberService, MemberRepository 내 메서드의 호출 시간을 측정하고 싶다고 하면 가장 기본적인 방법은 각각의 메서드에 시간 측정 로직을 추가하는 것이다.
-
-```
-public class MemberService {
-  public Long join(Member member) {
-
-    long start = System.currentTimeMillis(); // 호출 시작 시간
-
-    // 회원 가입 로직
-
-    long finish = System.currentTimeMillis(); // 호출 종료 시간
-    long timeMs = finish - start; // 호출 소요 시간
-  }
-
-  public List<Member> findMembers() {
-
-    long start = System.currentTimeMillis(); // 호출 시작 시간
-
-    // 전체 회원 조회 로직
-
-    long finish = System.currentTimeMillis(); // 호출 종료 시간
-    long timeMs = finish - start; // 호출 소요 시간
-  }
-}
-```
-
-이때, AOP를 적용하면 회원 가입, 회원 조회 등의 핵심 관심 사항과 호출 소요 시간을 측정하는 공통 관심 사항을 분리할 수 있다. 이때, 다음과 같이 시간을 측정하는 로직을 별도의 공통 로직으로 만들어 원하는 적용 대상에 적용한다.
-
-```
-@Component
-@Aspect
-public class TimeTraceAop {
-
-  @Around("execution(* hello.hellospring..*(..))") // 원하는 적용 대상 선택
-  public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
-
-    long start = System.currentTimeMillis();
-
-    System.out.println("START: " + joinPoint.toString());
-
-    try {
-      return joinPoint.proceed();
-    } finally {
-      long finish = System.currentTimeMillis();
-      long timeMs = finish - start;
-
-      System.out.println("END: " + joinPoint.toString()+ " " + timeMs + "ms");
-    }
-  }
-}
-```
-
-프록시는 AOP 적용 대상(타겟)을 감싸서 타겟의 요청을 대신 처리한다. 클라이언트에서 타겟을 호출하면 타겟을 감싸고 있는 프록시가 호출되어 타겟 메소드 실행전에 선처리, 타겟 메소드 실행 후 후처리를 실행시키도록 구성되어 있다. 즉, 프록시는 호출을 가로채 부가 기능을 수행 후 원래의 타겟 메소드를 호출한다.
+따라서 코드를 변경한다면 TestService에서가 아닌 TestRepository만을 가지고 findAll()을 테스트하면서, findAll()의 반환값이 올바른 값인지를 검증하는 로직을 추가하여 작성할 것 같다.
 
 ### 참고
-- https://velog.io/@kai6666/Spring-Spring-AOP-%EA%B0%9C%EB%85%90
-- https://engkimbs.tistory.com/746
-- https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%EC%9E%85%EB%AC%B8-%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8
-- https://n1tjrgns.tistory.com/261
-
-## PSA
-
-추상화 계층을 사용하여 어떤 기술을 내부에 숨기고 개발자가 추상화 계층만으로도 기술을 사용할 수 있도록 편의성을 제공해주는 것을 서비스 추상화(Service Abstraction)라고 한다. 예를 들어, @Transactional 어노테이션을 선언하는 것만으로 별도의 코드 추가 없이 트랜잭션 서비스를 사용할 수 있다.
-
-트랜잭션 서비스를 사용하는 동안 DB에 접근하게 되는데, 어떠한 방식으로 접근하더라도 개발자는 @Transactional 어노테이션을 이용하면 트랜잭션을 유지할 수 있다.
-
-스프링에서는 데이터를 캐싱하고 싶을 때 @Cacheable 어노테이션을 사용한다. 이때, 캐시를 로컬캐시에서 Redis로 바꾸고 싶다면 캐싱에 대한 비즈니스 로직을 모두 수정할 필요없이 CacheManager만 RedisCacheManager로 교체해주면 된다.
-
-이렇게 환경의 변화와 관계없이 일관된 방식의 기술로의 접근 환경을 제공하는 추상화 구조를 PSA(Portable Service Abstraction)라고 한다.
-
-PSA가 가능한 것은 추상화 계층이 존재하기 때문이다. 모든 CacheManager는 공통적인 인터페이스를 가지고 있기 때문에 해당 인터페이스를 구현하는 어떤 것으로 대체되든 프로그램에 영향이 없어지는 것이다. 이러한 점에서 PSA는 확장에는 열려있고 수정에는 닫혀있어야 한다는 OCP의 대표적인 예시라고 할 수 있다.
- 
-
-### 참고
-- https://sabarada.tistory.com/127
-- https://ch4njun.tistory.com/270
-
-## 새롭게 알게 된 점, 느낀 점
-
-IoC/DI와 AOP는 이전에 스프링을 공부하면서 공부한 내용이라 새롭지는 않았지만, 오랜만에 복습을 하게 되어 다시 한번 개념을 차근차근 정리할 수 있었다. AOP의 경우, 처음 공부하고나서 여러 번 프로젝트에 참여했지만 이 기술을 사용한 적은 한 번도 없었다. 언젠가는 한 번쯤 사용해보고 싶다.
-
-PSA는 이번 과제를 통해 처음 공부해보게 된 개념이다. 단어 자체는 아주 생소했지만 막상 공부해보니 개념 자체는 그리 낯설지 않았다. 이러한 개념이 따로 존재한다는 것을 몰랐을 뿐이지 스프링을 사용하다보면 앞서 언급한 예시들과 같이 PSA가 적용된 기술들을 다수 사용하게 되기 때문인 것 같다.
-
-Ioc/DI, AOP, PSA를 스프링이 제공하는 핵심 3대 요소라는 의미로 Spring Triangle이라고 묶어서 부른다고도 한다. 그만큼 이번주 과제를 통해 개념들을 공부하며 새삼 스프링이 개발자들에게 편의성을 제공한다는 사실을 실감할 수 있었다.
+- https://mangkyu.tistory.com/143
+- https://ko.wikipedia.org/wiki/%EC%9C%A0%EB%8B%9B_%ED%85%8C%EC%8A%A4%ED%8A%B8
+- https://support.suresofttech.com/ko/support/solutions/articles/5000760844-%ED%86%B5%ED%95%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80%EC%9A%94-
