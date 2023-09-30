@@ -1,10 +1,11 @@
 package com.ceos18.springboot.domain;
 
+import com.ceos18.springboot.domain.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
 @Entity(name = "PROD_IMG_LIST")
-public class ProductImage {
+public class ProductImage extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PROD_IMG_NO")

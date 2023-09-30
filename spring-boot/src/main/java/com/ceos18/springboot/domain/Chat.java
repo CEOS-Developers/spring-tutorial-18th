@@ -14,6 +14,16 @@ public class Chat extends BaseTimeEntity {
     @Column(name = "CHAT_NO")
     private Long chatNo;
 
+    @ManyToOne
+    @JoinColumn(name = "SEND_NO")
+    @NotNull
+    private User sender;
+
+    @ManyToOne
+    @JoinColumn(name = "RECV_NO")
+    @NotNull
+    private User receiver;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "CHAT_PIN_YN", columnDefinition = "CHAR(1)")
     @ColumnDefault("'N'")
@@ -34,14 +44,4 @@ public class Chat extends BaseTimeEntity {
     @NotNull
     @Size(max = 1)
     private StatusCode blockYN;
-
-    @ManyToOne
-    @JoinColumn(name = "SEND_NO")
-    @NotNull
-    private User sender;
-
-    @ManyToOne
-    @JoinColumn(name = "RECV_NO")
-    @NotNull
-    private User receiver;
 }

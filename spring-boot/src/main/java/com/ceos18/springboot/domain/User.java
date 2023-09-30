@@ -20,7 +20,7 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String nickName;
 
-    @Column(name = "HP_NM", length = 12, unique = true)
+    @Column(name = "PH_NM", length = 12, unique = true)
     @NotNull
     @Size(max = 12)
     private String phoneNumber;

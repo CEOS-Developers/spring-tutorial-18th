@@ -15,10 +15,6 @@ public class ChatMessage extends BaseTimeEntity{
     @Column(name = "MSG_NO")
     private Long messageNo;
 
-    @Column(name = "MSG_CONT", columnDefinition = "TEXT")
-    @NotNull
-    private String content;
-
     @ManyToOne
     @JoinColumn(name = "SEND_NO")
     @NotNull
@@ -28,4 +24,8 @@ public class ChatMessage extends BaseTimeEntity{
     @JoinColumn(name = "CHAT_NO")
     @NotNull
     private Chat chat;
+
+    @Column(name = "MSG_CONT", columnDefinition = "TEXT")
+    @NotNull
+    private String content;
 }

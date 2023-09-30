@@ -18,19 +18,22 @@ public class Product extends BaseTimeEntity {
     @NotNull
     private Long productNo;
 
+    @ManyToOne
+    @JoinColumn(name = "USR_NO")
+    private User userNo;
+
     @Column(name = "PROD_TIT")
     @NotNull
     private String title;
 
-    @Column(name = "PROD_KEYW")
+    @Column(name = "PROD_KEYW", length = 10)
+    @NotNull
+    @Size(max = 10)
     private String keyword;
 
     @Column(name = "PROD_CONT", columnDefinition = "TEXT")
     @NotNull
     private String content;
-
-    @Column(name = "PROD_IMG_URL_LST", columnDefinition = "TEXT")
-    private String imgUrlList;
 
     // Cell, Share
     @Enumerated(EnumType.STRING)
@@ -59,10 +62,6 @@ public class Product extends BaseTimeEntity {
     @Column(name = "PROD_SIZ", columnDefinition = "CHAR(4)")
     @Size(max = 4)
     private ClothesSize size;
-
-    @ManyToOne
-    @JoinColumn(name = "USR_NO")
-    private User userNo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "TRD_STAT", columnDefinition = "CHAR(11)")
