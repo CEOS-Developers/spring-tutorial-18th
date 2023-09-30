@@ -5,9 +5,14 @@ import com.ceos18.springboot.database.enums.StatusCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity(name = "USR_LIST")
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 테스트만 하고 빌더패턴 다시 구현할게요 ㅜㅜ
 public class User extends BaseTimeEntity {
     @Id
     @Column(name = "USR_NO", length = 12)
