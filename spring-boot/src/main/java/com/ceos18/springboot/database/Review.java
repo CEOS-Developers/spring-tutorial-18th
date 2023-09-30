@@ -1,11 +1,10 @@
-package com.ceos18.springboot.domain;
+package com.ceos18.springboot.database;
 
-import com.ceos18.springboot.domain.base.BaseTimeEntity;
-import com.ceos18.springboot.domain.enums.ReviewStatus;
+import com.ceos18.springboot.database.base.BaseTimeEntity;
+import com.ceos18.springboot.database.enums.ReviewStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity(name = "REVW_LIST")
 public class Review extends BaseTimeEntity {

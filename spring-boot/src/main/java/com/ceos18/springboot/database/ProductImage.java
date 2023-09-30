@@ -1,6 +1,6 @@
-package com.ceos18.springboot.domain;
+package com.ceos18.springboot.database;
 
-import com.ceos18.springboot.domain.base.BaseTimeEntity;
+import com.ceos18.springboot.database.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 

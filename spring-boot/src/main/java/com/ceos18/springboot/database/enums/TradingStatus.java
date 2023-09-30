@@ -1,4 +1,4 @@
-package com.ceos18.springboot.domain.enums;
+package com.ceos18.springboot.database.enums;
 
 import lombok.Getter;
 

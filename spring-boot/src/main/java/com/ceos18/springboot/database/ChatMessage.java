@@ -1,12 +1,8 @@
-package com.ceos18.springboot.domain;
+package com.ceos18.springboot.database;
 
-import com.ceos18.springboot.domain.base.BaseTimeEntity;
+import com.ceos18.springboot.database.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity(name = "CHAT_MSG_LIST")
 public class ChatMessage extends BaseTimeEntity{

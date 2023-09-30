@@ -1,10 +1,10 @@
-package com.ceos18.springboot.domain;
+package com.ceos18.springboot.database;
 
-import com.ceos18.springboot.domain.base.BaseTimeEntity;
-import com.ceos18.springboot.domain.enums.ClothesSize;
-import com.ceos18.springboot.domain.enums.TradingCode;
-import com.ceos18.springboot.domain.enums.StatusCode;
-import com.ceos18.springboot.domain.enums.TradingStatus;
+import com.ceos18.springboot.database.base.BaseTimeEntity;
+import com.ceos18.springboot.database.enums.ClothesSize;
+import com.ceos18.springboot.database.enums.TradingCode;
+import com.ceos18.springboot.database.enums.StatusCode;
+import com.ceos18.springboot.database.enums.TradingStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
