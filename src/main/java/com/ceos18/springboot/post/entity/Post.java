@@ -1,12 +1,13 @@
 package com.ceos18.springboot.post.entity;
 
+import com.ceos18.springboot.common.entity.BaseTimeEntity;
 import com.ceos18.springboot.user.entity.User;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "Post")
-public class Post {
+public class Post extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "postId")
@@ -41,13 +42,7 @@ public class Post {
     @Column(name = "productImage")
     private String productImage;
 
-    @Column(name = "created", nullable = false)
-    private Timestamp created;
-
-    @Column(name = "updated", nullable = false)
-    private Timestamp updated;
-
-    @Column(name = "status", nullable = false, length = 10)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PostStatus postStatus;
 
 }
