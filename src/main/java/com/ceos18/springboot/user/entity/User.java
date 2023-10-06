@@ -1,5 +1,6 @@
 package com.ceos18.springboot.user.entity;
 
+import com.ceos18.springboot.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userId")
@@ -34,12 +35,6 @@ public class User {
 
     @Column(name = "temperature", nullable = false)
     private BigDecimal temperature;
-
-    @Column(name = "created", nullable = false)
-    private Timestamp created;
-
-    @Column(name = "updated", nullable = false)
-    private Timestamp updated;
 
     public int getId() {
         return userId;
