@@ -1,10 +1,12 @@
 package com.ceos18.springboot.user.entity;
 
 import com.ceos18.springboot.common.entity.BaseTimeEntity;
-import jakarta.persistence.*;
+
 import lombok.*;
+
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+
 
 @Entity
 @Getter
@@ -15,8 +17,7 @@ import java.sql.Timestamp;
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
-    private int userId;
+    private Long id;
 
     @Column(name = "nickname", nullable = false)
     private String nickname;
@@ -30,14 +31,11 @@ public class User extends BaseTimeEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "imgUrl")
+    @Column(name = "profileimg")
     private String imgUrl;
 
-    @Column(name = "temperature", nullable = false)
+    @Column(name = "temperature", nullable = false, columnDefinition = "DECIMAL(4, 2) DEFAULT 36.5")
     private BigDecimal temperature;
 
-    public int getId() {
-        return userId;
-    }
 
 }
