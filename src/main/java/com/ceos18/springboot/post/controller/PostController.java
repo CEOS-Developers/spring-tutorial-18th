@@ -25,7 +25,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/api/board")
+@RequestMapping("/api/board/posts")
 public class PostController {
     private final PostService postService;
     private final PostRepository postRepository;
@@ -41,14 +41,14 @@ public class PostController {
     }
 
     // 상품 게시글 전체 조회
-    @GetMapping("/post")
+    @GetMapping("")
     public ResponseEntity<List<PostResponseDto>> getAllPosts() {
         List<PostResponseDto> responseDtos = postService.getAllPosts();
         return ResponseEntity.ok(responseDtos);
     }
 
     // 상품 게시글 조건별 조회
-    @GetMapping("/post/search")
+    @GetMapping("/{postId}")
     public ResponseEntity<List<PostResponseDto>> searchPosts(@RequestParam(value = "keyword",
                                                                             required = false) String keyword) {
         List<PostResponseDto> searchResults = postService.searchPosts(keyword);
@@ -56,7 +56,7 @@ public class PostController {
     }
 
     // 상품 게시글 삭제
-    @DeleteMapping("/post/{postId}")
+    @DeleteMapping("/{postId}")
     public ResponseEntity<NormalResponseDto> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         return ResponseEntity.ok(NormalResponseDto.success());
