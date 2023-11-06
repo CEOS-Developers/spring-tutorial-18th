@@ -1332,8 +1332,8 @@ public KarrotException(ErrorCode errorCode, String message, String solution) {
 }
 ```
 
-ex) 잘못된 Method 사용했을 경우
-<img width="638" alt="스크린샷 2023-10-07 13 29 47" src="https://github.com/CEOS-Developers/spring-tutorial-18th/assets/77966605/2ccacfae-ecdd-4e5b-a70c-eaa79d6c0b72">
+ex) 게시글이 존재하지 않는데 delete 요청한 경우
+<img width="692" alt="스크린샷 2023-11-06 16 49 41" src="https://github.com/yeni-choi/yeni-choi/assets/77966605/68e1edcd-c377-42b4-809f-6dbcc794a9d0">
 
 
 <br>
